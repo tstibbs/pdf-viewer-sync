@@ -1,0 +1,1 @@
+In order to keep the main 'viewer' UI as close as possible to the upstream source code (to simplify merging future changes) the majority of the extra code lives in this directory, with minimal integration into the main viewer UI.
