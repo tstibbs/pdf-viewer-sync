@@ -1,0 +1,25 @@
+{
+	"name": "@tstibbs/pdf-viewer-sync-backend",
+	"private": true,
+	"type": "module",
+	"dependencies": {
+		"aws-sdk": "^2.1092.0",
+		"dotenv": "^16.0.0"
+	},
+	"devDependencies": {
+		"@aws-cdk/aws-apigatewayv2": "^1.148.0",
+		"@aws-cdk/aws-apigatewayv2-integrations": "^1.148.0",
+		"@aws-cdk/aws-dynamodb": "^1.148.0",
+		"@aws-cdk/aws-lambda": "^1.148.0",
+		"@aws-cdk/aws-lambda-nodejs": "^1.148.0",
+		"@aws-cdk/core": "^1.148.0",
+		"@tstibbs/cloud-core-utils": "file:../../cloud-core/aws/utils",
+		"aws-cdk": "^1.148.0",
+		"esbuild": "^0.14.26",
+		"jest": "^27.5.1"
+	},
+	"scripts": {
+		"testsynth": "cdk-tools testsynth",
+		"test": "cdk-tools testcdk"
+	}
+}
