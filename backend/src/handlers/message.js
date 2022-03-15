@@ -19,6 +19,8 @@ export async function handler(event) {
 			console.error(`${connectionIds.join(',')} !includes ${connectionId}`)
 			throw new Error("Own connection id not included in list to send to - this indicates a problem.")
 		}
+		//remove our connection id, no point telling the originator to change page when it literally just changed to this number
+		connectionIds = connectionIds.filter(id => id != connectionId)
 	} catch (e) {
 		console.error(e)
 		return { statusCode: 500, body: e.stack }
