@@ -42,11 +42,10 @@ export class Comms {
 	}
 
 	_recievedPageChange(pageNumber) {
-		if (pageNumber != this._mostRecentPageNumber) { //to prevent an infinite loop if this client gets notified about its own changes
-			PDFViewerApplication.eventBus.dispatch("pagenumberchanged", {
-				value: pageNumber
-			})
-		}
+		this._lastRecievedPageNumber = pageNumber
+		PDFViewerApplication.eventBus.dispatch("pagenumberchanged", {
+			value: pageNumber
+		})
 	}
 
 	async waitForSocketReady() {
@@ -54,12 +53,14 @@ export class Comms {
 	}
 
 	async sendPageChange(pageNumber) {
-		await this.waitForSocketReady()
-		let data = {
-			type: 'changepage',
-			value: pageNumber
+		if (pageNumber != this._lastRecievedPageNumber) { //attempt to prevent infinite loop from events firing for changes we made
+			this._lastRecievedPageNumber = null
+			await this.waitForSocketReady()
+			let data = {
+				type: 'changepage',
+				value: pageNumber
+			}
+			this._socket.send(JSON.stringify({"action":"sendmessage", data: data}))
 		}
-		this._mostRecentPageNumber = pageNumber
-		this._socket.send(JSON.stringify({"action":"sendmessage", data: data}))
 	}
 }
