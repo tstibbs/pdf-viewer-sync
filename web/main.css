@@ -1,0 +1,60 @@
+/*!*********************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js!./src/additions.css ***!
+  \*********************************************************************/
+.sync-base-panel {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 99999;
+	background-color: #ffffffc2;
+}
+
+.sync-base-panel .wrapper {
+	position: absolute;
+	width: 90%;
+	height: 90%;
+	left: 5%;
+	right: 5%;
+	top: 5%;
+	bottom: 5%;
+	display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.sync-base-panel .inner {
+    background: lightgrey;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    flex-wrap: wrap;
+	padding: 10px;
+}
+
+.sync-base-panel label {
+	padding: 15px;
+}
+
+#sync-share-link {
+	font-family: sans-serif;
+	text-align: center;
+	padding: 15px;
+}
+
+div#toolbarViewerMiddle, button#viewFind, button#print, a#viewBookmark, a#viewBookmark + div.verticalToolbarSeparator, button#download, button#secondaryToolbarToggle {
+	/* hide all these */
+	display: none !important;
+}
+
+button#presentationMode, button#openFile {
+	/* override the media queries that are hiding these */
+	display: inherit !important;
+}
+
+.toolbarButton.shareAndSync::before {
+	-webkit-mask-image: url(6046aacfc24d7e5e1f1c.svg);
+	mask-image: url(6046aacfc24d7e5e1f1c.svg);
+}
+
