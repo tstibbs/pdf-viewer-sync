@@ -12,6 +12,7 @@ class UiAdditions {
 	}
 
 	async init() {
+		await stayAwake()
 		if (this._webSocketBase != null && this._webSocketBase.length > 0) {
 			const sharer = new Sharer(this._urlUtils)
 			const components = new Components(this._urlUtils, sharer)
