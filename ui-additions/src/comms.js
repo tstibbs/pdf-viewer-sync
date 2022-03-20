@@ -42,6 +42,7 @@ export class Comms {
 	}
 
 	_recievedPageChange(pageNumber) {
+		pageNumber += this._urlUtils.getPosition()
 		this._lastRecievedPageNumber = pageNumber
 		PDFViewerApplication.eventBus.dispatch("pagenumberchanged", {
 			value: pageNumber
@@ -54,6 +55,7 @@ export class Comms {
 
 	async sendPageChange(pageNumber) {
 		if (pageNumber != this._lastRecievedPageNumber) { //attempt to prevent infinite loop from events firing for changes we made
+			pageNumber -= this._urlUtils.getPosition()
 			this._lastRecievedPageNumber = null
 			await this.waitForSocketReady()
 			let data = {

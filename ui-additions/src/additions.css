@@ -1,4 +1,4 @@
-#sync-share-panel {
+.sync-base-panel {
 	position: absolute;
 	left: 0;
 	top: 0;
@@ -8,7 +8,7 @@
 	background-color: #ffffffc2;
 }
 
-#sync-share-panel .wrapper {
+.sync-base-panel .wrapper {
 	position: absolute;
 	width: 90%;
 	height: 90%;
@@ -21,13 +21,17 @@
     justify-content: center;
 }
 
-#sync-share-panel .inner {
+.sync-base-panel .inner {
     background: lightgrey;
     display: flex;
     align-items: center;
     flex-direction: column;
     flex-wrap: wrap;
 	padding: 10px;
+}
+
+.sync-base-panel label {
+	padding: 15px;
 }
 
 #sync-share-link {

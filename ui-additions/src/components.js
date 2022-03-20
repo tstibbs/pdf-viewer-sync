@@ -1,22 +1,50 @@
 import './additions.css'
 
 export class Components {
-	constructor(sharer) {
+	constructor(urlUtils, sharer) {
+		this._urlUtils = urlUtils
 		this._sharer = sharer
 	}
 
 	build() {
+		if (this._urlUtils.getPosition() == null) {
+			this._addJoinPanel()
+		}
 		this._addSharePanel()
 		this._addShareButton()
 		this._listenForClicks()
 	}
 
-	_addSharePanel() { //add share panel (hidden initially)
-		this._panel = document.createElement('div')
-		this._panel.id = 'sync-share-panel'
-		this._panel.style = "display: none"
-		this._panel.innerHTML = `
+	_addJoinPanel() { //add panel that shows if you're joining a pool
+		this._joinPanel = document.createElement('div')
+		this._joinPanel.id = 'sync-join-panel'
+		this._joinPanel.classList.add('sync-base-panel')
+		this._joinPanel.innerHTML = `
 		<div class="wrapper">
+			<div class="inner">
+				<label>Join sync pool with position: 
+					<input type="number" name="position" min="-100" max="100" value="1">
+				</label>
+				<button type="button" id="sync-join-close">Ok</button>
+			<div>
+		</div>
+		`
+		document.body.appendChild(this._joinPanel)
+		this._positionInput = document.querySelector('input[name="position"]')
+		this._joinCloseButton = document.getElementById('sync-join-close')
+		this._joinCloseButton.addEventListener('click', () => {
+			this._urlUtils.updatePosition(this._positionInput.value)
+			this._hideJoinPanel()
+		})
+	}
+
+	_addSharePanel() { //add share panel (hidden initially)
+		this._sharePanel = document.createElement('div')
+		this._sharePanel.id = 'sync-share-panel'
+		this._sharePanel.classList.add('sync-base-panel')
+		this._sharePanel.style = "display: none"
+		this._sharePanel.innerHTML = `
+		<div class="wrapper" id="sync-share-wrapper">
 			<div class="inner">
 				<canvas id="sync-share-canvas"></canvas>
 				<div id="sync-share-link"><a href="" target="_blank"></a></div>
@@ -24,11 +52,11 @@ export class Components {
 			<div>
 		</div>
 		`
-		document.body.appendChild(this._panel)
-		this._closeButton = document.getElementById('sync-share-close')
+		document.body.appendChild(this._sharePanel)
+		this._shareCloseButton = document.getElementById('sync-share-close')
 		this._link = document.querySelector('#sync-share-link > a')
 		this._canvas = document.getElementById('sync-share-canvas')
-		this._wrapper = document.querySelector('div.wrapper')
+		this._wrapper = document.querySelector('#sync-share-panel div.wrapper')
 	}
 
 	_addShareButton() { //add button to open share panel
@@ -42,12 +70,12 @@ export class Components {
 	}
 
 	_listenForClicks() {
-		this._panel.addEventListener('click', event => {
-			if (event.target === this._panel || event.target === this._wrapper) { //i.e. ignore clicks from child elements
+		this._sharePanel.addEventListener('click', event => {
+			if (event.target === this._sharePanel || event.target === this._wrapper) { //i.e. ignore clicks from child elements
 				this._hideSharePanel()
 			}
 		})
-		this._closeButton.addEventListener('click', () => {
+		this._shareCloseButton.addEventListener('click', () => {
 			this._hideSharePanel()
 		})
 		this._openButton.addEventListener('click', () => {
@@ -55,14 +83,18 @@ export class Components {
 		})
 	}
 
+	_hideJoinPanel() {
+		this._joinPanel.style = "display: none"
+	}
+
 	async _showSharePanel() {
 		let shareUrl = await this._sharer.showShareInfo(this._canvas)
 		this._link.href = shareUrl
 		this._link.text = shareUrl
-		this._panel.style = ""
+		this._sharePanel.style = ""
 	}
 
 	_hideSharePanel() {
-		this._panel.style = "display: none"
+		this._sharePanel.style = "display: none"
 	}
 }

@@ -1,3 +1,4 @@
+import {stayAwake} from './awake.js'
 import {Components} from './components.js'
 import {PdfIntegration} from './pdf-integration.js'
 import {Comms} from './comms.js'
@@ -12,11 +13,12 @@ class UiAdditions {
 
 	async init() {
 		if (this._webSocketBase != null && this._webSocketBase.length > 0) {
-			const comms = new Comms(this._urlUtils)
+			const sharer = new Sharer(this._urlUtils)
+			const components = new Components(this._urlUtils, sharer)
+			this._joinToken = this._urlUtils.getJoinToken()
+			const comms = new Comms(this._urlUtils, components)
 			try {
 				await comms.waitForSocketReady()
-				const sharer = new Sharer(comms, this._urlUtils)
-				const components = new Components(sharer)
 				components.build()
 				const integration = new PdfIntegration(comms)
 				integration.listenForPageChanges()
