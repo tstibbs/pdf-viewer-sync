@@ -28,6 +28,7 @@ export class Components {
 		this._closeButton = document.getElementById('sync-share-close')
 		this._link = document.querySelector('#sync-share-link > a')
 		this._canvas = document.getElementById('sync-share-canvas')
+		this._wrapper = document.querySelector('div.wrapper')
 	}
 
 	_addShareButton() { //add button to open share panel
@@ -41,6 +42,11 @@ export class Components {
 	}
 
 	_listenForClicks() {
+		this._panel.addEventListener('click', event => {
+			if (event.target === this._panel || event.target === this._wrapper) { //i.e. ignore clicks from child elements
+				this._hideSharePanel()
+			}
+		})
 		this._closeButton.addEventListener('click', () => {
 			this._hideSharePanel()
 		})
