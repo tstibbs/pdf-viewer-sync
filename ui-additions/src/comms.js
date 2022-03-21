@@ -1,20 +1,25 @@
-const webSocketBase = ''
+import {apiGatewayJoinTokenParam} from './constants.js'
 
 export class Comms {
 
-	constructor() {
-		
-		this._joinToken = (new URLSearchParams(location.search)).get('joinToken')
-		let webSocketUrl = webSocketBase
+	constructor(urlUtils) {
+		this._urlUtils = urlUtils
+		this._joinToken = this._urlUtils.getJoinToken()
+		let webSocketUrl = this._urlUtils.getWebSocketBase()
 		if (this._joinToken != null) {
-			webSocketUrl = `${webSocketUrl}?joinToken=${this._joinToken}`
+			webSocketUrl = `${webSocketUrl}?${apiGatewayJoinTokenParam}=${this._joinToken}`
 		}
 		this._socket = new WebSocket(webSocketUrl)
-		this._socketOpenPromise = new Promise((resolve) => {
+		this._socketReadyPromise = new Promise((resolve, reject) => {
+			this._socket.onerror = (event) => {
+				reject(event)
+			}
+
 			this._socket.onopen = () => {
 				console.log('Connection opened')
-				resolve()
-				if (this._joinToken == null) {
+				if (this._joinToken != null) {
+					resolve() // we already have a join token, so the socket is set up and ready to use
+				} else {
 					this._socket.send(JSON.stringify({"action":"getPoolId"}))
 				}
 			}
@@ -24,6 +29,8 @@ export class Comms {
 				if (data.poolId !== undefined) {
 					this._joinToken = data.poolId
 					console.log(`New join token: ${this._joinToken}`)
+					this._urlUtils.updateJoinToken(this._joinToken)
+					resolve() // join token recieved, so we're ready to share now
 				} else if (data.type === 'changepage') {
 					console.log(`message recieved: ${JSON.stringify(data)}`)
 					this._recievedPageChange(data.value)
@@ -42,17 +49,17 @@ export class Comms {
 		}
 	}
 
+	async waitForSocketReady() {
+		await this._socketReadyPromise
+	}
+
 	async sendPageChange(pageNumber) {
-		await this._socketOpenPromise
+		await this.waitForSocketReady()
 		let data = {
 			type: 'changepage',
 			value: pageNumber
 		}
 		this._mostRecentPageNumber = pageNumber
 		this._socket.send(JSON.stringify({"action":"sendmessage", data: data}))
-	}
-
-	getJoinToken() {
-		return this._joinToken
 	}
 }

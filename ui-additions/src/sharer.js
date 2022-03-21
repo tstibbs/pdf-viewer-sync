@@ -1,23 +1,14 @@
 import qrcode from 'qrcode'
 
 export class Sharer {
-	constructor(comms) {
+	constructor(comms, urlUtils) {
 		this._comms = comms
-		this._viewerUrl = new URL(location.pathname, location.href).href
-		const panel = document.getElementById('sync-share-panel')
-		panel.addEventListener('click', event => {
-			this._showShareInfo()
-		})
+		this._urlUtils = urlUtils
 	}
 
-	async _showShareInfo() {
-		const joinToken = this._comms.getJoinToken()
-		const shareUrl = `${this._viewerUrl}?joinToken=${joinToken}`
-		const canvas = document.getElementById('sync-share-canvas')
+	async showShareInfo(canvas) {
+		const shareUrl = this._urlUtils.generateUrl()
 		await qrcode.toCanvas(canvas, shareUrl)
-		let link = document.createElement('a')
-		link.href = shareUrl
-		link.text = shareUrl
-		document.getElementById('sync-share-link').appendChild(link)
+		return shareUrl
 	}
 }

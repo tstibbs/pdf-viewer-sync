@@ -1,10 +1,34 @@
-import {buildUi} from './components.js'
+import {Components} from './components.js'
 import {PdfIntegration} from './pdf-integration.js'
 import {Comms} from './comms.js'
 import {Sharer} from './sharer.js'
+import {UrlUtils} from './url-utils.js'
 
-buildUi()
-const comms = new Comms()
-const integration = new PdfIntegration(comms)
-integration.listenForPageChanges()
-const sharer = new Sharer(comms)
+class UiAdditions {
+	constructor() {
+		this._urlUtils = new UrlUtils()
+		this._webSocketBase = this._urlUtils.getWebSocketBase()
+	}
+
+	async init() {
+		if (this._webSocketBase != null && this._webSocketBase.length > 0) {
+			const comms = new Comms(this._urlUtils)
+			try {
+				await comms.waitForSocketReady()
+				const sharer = new Sharer(comms, this._urlUtils)
+				const components = new Components(sharer)
+				components.build()
+				const integration = new PdfIntegration(comms)
+				integration.listenForPageChanges()
+			} catch (e) {
+				console.error("Not enabling share feature, failed to establish websocket connectivity.")
+				console.error(e)
+			}
+		} else {
+			console.log("Not enabling share feature, empty websocket url provided - set the 'websocket' URL param to the full URL of the websocket.")
+		}
+	}
+}
+
+(new UiAdditions()).init()//async but no need to wait
+
