@@ -41,7 +41,7 @@ export class UrlUtils {
 	}
 
 	_generateUrl(urlParams) {
-		return `${this._viewerBase}?${urlParams}`
+		return `${this._viewerBase}?${urlParams}${location.hash}`
 	}
 
 	getJoinToken() {
