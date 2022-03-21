@@ -1,4 +1,5 @@
 import './additions.css'
+import {changePage} from './pdf-integration.js'
 
 export class Components {
 	constructor(urlUtils, sharer) {
@@ -34,6 +35,8 @@ export class Components {
 		this._joinCloseButton = document.getElementById('sync-join-close')
 		this._joinCloseButton.addEventListener('click', () => {
 			this._urlUtils.updatePosition(this._positionInput.value)
+			//trigger it to update now we have the correct position info
+			changePage(this._urlUtils.getStartingPage(), this._urlUtils.getPosition())
 			this._hideJoinPanel()
 		})
 	}

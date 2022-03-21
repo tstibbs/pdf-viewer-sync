@@ -1,4 +1,5 @@
 import {apiGatewayJoinTokenParam} from './constants.js'
+import {changePage} from './pdf-integration.js'
 
 export class Comms {
 
@@ -42,11 +43,11 @@ export class Comms {
 	}
 
 	_recievedPageChange(pageNumber) {
-		pageNumber += this._urlUtils.getPosition()
-		this._lastRecievedPageNumber = pageNumber
-		PDFViewerApplication.eventBus.dispatch("pagenumberchanged", {
-			value: pageNumber
-		})
+		if (this._urlUtils.isPositionSet()) { // if the user hasn't yet chosen a position param, ignore this event
+			let position = this._urlUtils.getPosition()
+			this._lastRecievedPageNumber = pageNumber + position
+			changePage(pageNumber, position)
+		}
 	}
 
 	async waitForSocketReady() {
@@ -54,15 +55,17 @@ export class Comms {
 	}
 
 	async sendPageChange(pageNumber) {
-		if (pageNumber != this._lastRecievedPageNumber) { //attempt to prevent infinite loop from events firing for changes we made
-			pageNumber -= this._urlUtils.getPosition()
-			this._lastRecievedPageNumber = null
-			await this.waitForSocketReady()
-			let data = {
-				type: 'changepage',
-				value: pageNumber
+		if (this._urlUtils.isPositionSet()) { // if the user hasn't yet chosen a position param, ignore this event
+			if (pageNumber != this._lastRecievedPageNumber) { //attempt to prevent infinite loop from events firing for changes we made
+				pageNumber -= this._urlUtils.getPosition()
+				this._lastRecievedPageNumber = null
+				await this.waitForSocketReady()
+				let data = {
+					type: 'changepage',
+					value: pageNumber
+				}
+				this._socket.send(JSON.stringify({"action":"sendmessage", data: data}))
 			}
-			this._socket.send(JSON.stringify({"action":"sendmessage", data: data}))
 		}
 	}
 }

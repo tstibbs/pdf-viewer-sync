@@ -1,6 +1,6 @@
 import {stayAwake} from './awake.js'
 import {Components} from './components.js'
-import {PdfIntegration} from './pdf-integration.js'
+import {listenForPageChanges} from './pdf-integration.js'
 import {Comms} from './comms.js'
 import {Sharer} from './sharer.js'
 import {UrlUtils} from './url-utils.js'
@@ -21,8 +21,7 @@ class UiAdditions {
 			try {
 				await comms.waitForSocketReady()
 				components.build()
-				const integration = new PdfIntegration(comms)
-				integration.listenForPageChanges()
+				listenForPageChanges(comms)
 			} catch (e) {
 				console.error("Not enabling share feature, failed to establish websocket connectivity.")
 				console.error(e)
@@ -34,4 +33,3 @@ class UiAdditions {
 }
 
 (new UiAdditions()).init()//async but no need to wait
-
