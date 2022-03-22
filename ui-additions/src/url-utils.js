@@ -1,9 +1,9 @@
-import {joinTokenParam, webSocketParam, positionParam, pageParam} from './constants.js'
-import {getCurrentPage} from './pdf-integration.js'
+import {joinTokenParam, webSocketParam, positionParam, pageParam, fileParam} from './constants.js'
+import {getCurrentPage, getCurrentFile} from './pdf-integration.js'
 
 export class UrlUtils {
 	constructor() {
-		this._urlParams = new URLSearchParams(location.search)
+		this._urlParams = this._parseHash(location.hash)
 		this._joinToken = this._urlParams.get(joinTokenParam)
 		this._position = this._urlParams.get(positionParam)
 		this._webSocketBase = this._urlParams.get(webSocketParam)
@@ -19,6 +19,13 @@ export class UrlUtils {
 			//we are the first UI, so assume position 0 and initialise it as such to prevent "join pool?" popups
 			this.updatePosition(0)
 		}
+	}
+
+	_parseHash(hash) {
+		if (hash.startsWith('#')) {
+			hash = hash.substring(1)
+		}
+		return new URLSearchParams(hash)
 	}
 
 	updatePosition(position) {
@@ -43,11 +50,12 @@ export class UrlUtils {
 		let clientParams = new URLSearchParams(this._urlParams.toString()) //clone url params so we can modify before passing on
 		clientParams.delete(positionParam) // don't want to set a position for clients, let them choose it
 		clientParams.set(pageParam, this._fetchCurrentPage())
+		clientParams.set(fileParam, getCurrentFile()) // ensure we're getting the latest, don't bother trying to track URL changes just to avoid this
 		return this._generateUrl(clientParams)
 	}
 
 	_generateUrl(urlParams) {
-		return `${this._viewerBase}?${urlParams}${location.hash}`
+		return `${this._viewerBase}${location.search}#${urlParams}`
 	}
 
 	getJoinToken() {
