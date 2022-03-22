@@ -6,6 +6,7 @@ import { WebSocketApi, WebSocketStage } from '@aws-cdk/aws-apigatewayv2'
 import { WebSocketLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations'
 
 import { TABLE_SCHEMA } from '../src/constants.js'
+import { actionSendMessage, actionGetPoolId } from '../../ui-additions/src/constants.js'
 
 class DeployStack extends Stack {
 	constructor(scope, id, props) {
@@ -33,10 +34,10 @@ class DeployStack extends Stack {
 			connectRouteOptions: { integration: new WebSocketLambdaIntegration('ConnectIntegration', connectHandler) },
 			disconnectRouteOptions: { integration: new WebSocketLambdaIntegration('DisconnectIntegration', disconnectHandler) },
 		})
-		webSocketApi.addRoute('sendmessage', {
+		webSocketApi.addRoute(actionSendMessage, {
 			integration: new WebSocketLambdaIntegration('SendMessageIntegration', messageHandler)
 		})
-		webSocketApi.addRoute('getPoolId', {
+		webSocketApi.addRoute(actionGetPoolId, {
 			integration: new WebSocketLambdaIntegration('getPoolIdIntegration', getPoolIdHandler)
 		})
 

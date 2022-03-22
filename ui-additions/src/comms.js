@@ -1,4 +1,4 @@
-import {apiGatewayJoinTokenParam} from './constants.js'
+import {apiGatewayJoinTokenParam, messageTypeChangePage, actionSendMessage, actionGetPoolId} from './constants.js'
 import {changePage} from './pdf-integration.js'
 
 export class Comms {
@@ -21,7 +21,7 @@ export class Comms {
 				if (this._joinToken != null) {
 					resolve() // we already have a join token, so the socket is set up and ready to use
 				} else {
-					this._socket.send(JSON.stringify({"action":"getPoolId"}))
+					this._sendGetPoolId()
 				}
 			}
 
@@ -32,7 +32,7 @@ export class Comms {
 					console.log(`New join token: ${this._joinToken}`)
 					this._urlUtils.updateJoinToken(this._joinToken)
 					resolve() // join token recieved, so we're ready to share now
-				} else if (data.type === 'changepage') {
+				} else if (data.type === messageTypeChangePage) {
 					console.log(`message recieved: ${JSON.stringify(data)}`)
 					this._recievedPageChange(data.value)
 				} else {
@@ -40,6 +40,28 @@ export class Comms {
 				}
 			}
 		})
+	}
+
+	_sendGetPoolId() {
+		this._sendMessage(actionGetPoolId)
+	}
+
+	_sendChangePage(pageNumber) {
+		let data = {
+			type: messageTypeChangePage,
+			value: pageNumber
+		}
+		this._sendMessage(actionSendMessage, data)
+	}
+
+	_sendMessage(action, data) {
+		let message = {
+			action
+		}
+		if (data != null) {
+			message.data = data
+		}
+		this._socket.send(JSON.stringify(message))
 	}
 
 	_recievedPageChange(pageNumber) {
@@ -60,11 +82,7 @@ export class Comms {
 				pageNumber -= this._urlUtils.getPosition()
 				this._lastRecievedPageNumber = null
 				await this.waitForSocketReady()
-				let data = {
-					type: 'changepage',
-					value: pageNumber
-				}
-				this._socket.send(JSON.stringify({"action":"sendmessage", data: data}))
+				this._sendChangePage(pageNumber)
 			}
 		}
 	}
