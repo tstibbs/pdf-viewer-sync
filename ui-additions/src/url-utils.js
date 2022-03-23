@@ -31,19 +31,23 @@ export class UrlUtils {
 	updatePosition(position) {
 		this._position = parseInt(position)
 		this._urlParams.set(positionParam, this._position)
-		const url = this._generateMyUrl()
-		window.history.pushState({}, '', url)
+		this._updateMyUrl()
 	}
 
 	updateJoinToken(joinToken) {
 		this._joinToken = joinToken
 		this._urlParams.set(joinTokenParam, this._joinToken)
-		const url = this._generateMyUrl()
-		window.history.pushState({}, '', url);
+		this._updateMyUrl()
 	}
 
-	_generateMyUrl() {
-		return this._generateUrl(this._urlParams)
+	updateFile(file) {
+		this._urlParams.set(fileParam, file)
+		this._updateMyUrl()
+	}
+
+	_updateMyUrl() {
+		const url = this._generateUrl(this._urlParams)
+		window.history.pushState({}, '', url);
 	}
 
 	generateClientUrl() {

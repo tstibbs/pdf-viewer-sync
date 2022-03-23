@@ -1,9 +1,11 @@
-import {apiGatewayJoinTokenParam, messageTypeChangePage, actionSendMessage, actionGetPoolId} from './constants.js'
-import {changePage} from './pdf-integration.js'
+import {apiGatewayJoinTokenParam, messageTypeChangePage, actionSendMessage, actionGetPoolId, messageTypeLoadFile} from './constants.js'
+import {changePage, loadPdfFromParams} from './pdf-integration.js'
 
 export class Comms {
 
 	constructor(urlUtils) {
+		this._lastRecievedPageNumber = null
+		this._lastRecievedFileLoad = null
 		this._urlUtils = urlUtils
 		this._joinToken = this._urlUtils.getJoinToken()
 		let webSocketUrl = this._urlUtils.getWebSocketBase()
@@ -35,6 +37,9 @@ export class Comms {
 				} else if (data.type === messageTypeChangePage) {
 					console.log(`message recieved: ${JSON.stringify(data)}`)
 					this._recievedPageChange(data.value)
+				} else if (data.type === messageTypeLoadFile) {
+					console.log(`message recieved: ${JSON.stringify(data)}`)
+					this._recievedLoadFile(data.value)
 				} else {
 					console.error('Unexpected data type: ' + JSON.stringify(data))
 				}
@@ -50,6 +55,14 @@ export class Comms {
 		let data = {
 			type: messageTypeChangePage,
 			value: pageNumber
+		}
+		this._sendMessage(actionSendMessage, data)
+	}
+
+	_sendLoadFile(file) {
+		let data = {
+			type: messageTypeLoadFile,
+			value: file
 		}
 		this._sendMessage(actionSendMessage, data)
 	}
@@ -72,18 +85,32 @@ export class Comms {
 		}
 	}
 
+	_recievedLoadFile(file) {
+		this._lastRecievedFileLoad = file
+		this._urlUtils.updateFile(file)
+		loadPdfFromParams()
+	}
+
 	async waitForSocketReady() {
 		await this._socketReadyPromise
 	}
 
 	async sendPageChange(pageNumber) {
 		if (this._urlUtils.isPositionSet()) { // if the user hasn't yet chosen a position param, ignore this event
-			if (pageNumber != this._lastRecievedPageNumber) { //attempt to prevent infinite loop from events firing for changes we made
+			if (pageNumber != this._lastRecievedPageNumber) { //attempt to prevent infinite loop from events firing for changes we previously recieved
 				pageNumber -= this._urlUtils.getPosition()
 				this._lastRecievedPageNumber = null
 				await this.waitForSocketReady()
 				this._sendChangePage(pageNumber)
 			}
+		}
+	}
+
+	async sendLoadFile(file) {
+		if (file != this._lastRecievedFileLoad) { //attempt to prevent infinite loop from events firing for changes we previously recieved
+			this._lastRecievedPageNumber = null
+			await this.waitForSocketReady()
+			this._sendLoadFile(file)
 		}
 	}
 }
