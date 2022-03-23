@@ -46,7 +46,6 @@ function _waitForPromise(comms) {
 			}
 		})
 
-
 		//now register a listener for when the page changes
 		PDFViewerApplication.eventBus.on('pagechanging', event => {
 			const {pageNumber} = event
@@ -70,9 +69,17 @@ export function getCurrentFile() {
 	return PDFViewerApplication.url
 }
 
-export function loadPdfFromParams() {
+export function loadPdfFromParams(page = null, position = null) {
 	let file = new URLSearchParams(location.hash).get('file')
 	if (file != null && file.length > 0) {
+		if (page != null) {
+			//if page is specified, wait until the file has been loaded before attempting to change page
+			PDFViewerApplication.eventBus.on('pagesloaded', () => {
+				changePage(page, position)
+			}, {
+				once: true
+			})
+		}
 		PDFViewerApplication.open(file)
 	}
 }

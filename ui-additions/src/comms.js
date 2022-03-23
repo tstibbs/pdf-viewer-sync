@@ -1,5 +1,5 @@
 import {apiGatewayJoinTokenParam, messageTypeChangePage, actionSendMessage, actionGetPoolId, messageTypeLoadFile} from './constants.js'
-import {changePage, loadPdfFromParams} from './pdf-integration.js'
+import {changePage, loadPdfFromParams, getCurrentPage} from './pdf-integration.js'
 
 export class Comms {
 
@@ -62,7 +62,10 @@ export class Comms {
 	_sendLoadFile(file) {
 		let data = {
 			type: messageTypeLoadFile,
-			value: file
+			value: {
+				file: file,
+				page: getCurrentPage()
+			}
 		}
 		this._sendMessage(actionSendMessage, data)
 	}
@@ -85,10 +88,12 @@ export class Comms {
 		}
 	}
 
-	_recievedLoadFile(file) {
+	_recievedLoadFile({file, page}) {
 		this._lastRecievedFileLoad = file
+		let position = this._urlUtils.getPosition()
+		this._lastRecievedPageNumber = page + position
 		this._urlUtils.updateFile(file)
-		loadPdfFromParams()
+		loadPdfFromParams(page, position)
 	}
 
 	async waitForSocketReady() {
