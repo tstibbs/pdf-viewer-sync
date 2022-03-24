@@ -1,3 +1,5 @@
+import {fileParam} from './constants.js'
+
 export function listenForChanges(comms) {
 	if (PDFViewerApplication.initializedPromise != undefined) {
 		_waitForPromise(comms)
@@ -28,8 +30,8 @@ function _waitForPromise(comms) {
 		//listen for the hash being changed by another page with a target attribute, to see if we should be loading a new file
 		window.addEventListener('hashchange', event => {
 			const {newURL, oldURL} = event
-			let newFile = new URLSearchParams((new URL(newURL)).hash).get('file')
-			let oldFile = new URLSearchParams((new URL(oldURL)).hash).get('file')
+			let newFile = new URLSearchParams((new URL(newURL)).hash).get(fileParam)
+			let oldFile = new URLSearchParams((new URL(oldURL)).hash).get(fileParam)
 			if (oldFile != newFile) {
 				loadPdfFromParams()
 			}
@@ -70,7 +72,7 @@ export function getCurrentFile() {
 }
 
 export function loadPdfFromParams(page = null, position = null) {
-	let file = new URLSearchParams(location.hash).get('file')
+	let file = new URLSearchParams(location.hash).get(fileParam)
 	if (file != null && file.length > 0) {
 		if (page != null) {
 			//if page is specified, wait until the file has been loaded before attempting to change page

@@ -8,6 +8,7 @@ export class UrlUtils {
 		this._position = this._urlParams.get(positionParam)
 		this._webSocketBase = this._urlParams.get(webSocketParam)
 		this._startingPage = this._urlParams.get(pageParam)
+		this._file = this._urlParams.get(fileParam)
 		this._viewerBase = new URL(location.pathname, location.href).href
 		if (this._position != null) {
 			this._position = parseInt(this._position)
@@ -41,7 +42,8 @@ export class UrlUtils {
 	}
 
 	updateFile(file) {
-		this._urlParams.set(fileParam, file)
+		this._file = file
+		this._urlParams.set(fileParam, this._file)
 		this._updateMyUrl()
 	}
 
@@ -76,6 +78,10 @@ export class UrlUtils {
 
 	getStartingPage() {
 		return this._startingPage
+	}
+
+	getFile() {
+		return this._file
 	}
 
 	_fetchCurrentPage() {

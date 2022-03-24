@@ -4,9 +4,11 @@ import {changePage, loadPdfFromParams, getCurrentPage} from './pdf-integration.j
 export class Comms {
 
 	constructor(urlUtils) {
-		this._lastRecievedPageNumber = null
-		this._lastRecievedFileLoad = null
 		this._urlUtils = urlUtils
+		// initialise such that we don't publish a 'page change' event when we load the file and switch to the right page
+		this._lastRecievedPageNumber = this._urlUtils.getStartingPage + this._urlUtils.getPosition()
+		// initialise such that we don't publish a 'file change' event when we load the file
+		this._lastRecievedFileLoad = this._urlUtils.getFile()
 		this._joinToken = this._urlUtils.getJoinToken()
 		let webSocketUrl = this._urlUtils.getWebSocketBase()
 		if (this._joinToken != null) {
