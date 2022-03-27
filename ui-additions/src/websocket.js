@@ -1,4 +1,7 @@
+import {actionPing} from './constants.js'
+
 const THREE_HOURS_IN_MILLIS = 3 * 60 * 60 * 1000
+const FIVE_MINS_IN_MILLIS = 5 * 60 * 1000
 
 export class ResilientWebSocket {
 
@@ -37,6 +40,9 @@ export class ResilientWebSocket {
 
 			this._socket.onmessage = this._handleMessage.bind(this)
 		})
+		this._socketReadyPromise.then(() => {//no need to make this method wait for this
+			this._startPinging()
+		})
 	}
 
 	_closeSocket() {
@@ -54,6 +60,23 @@ export class ResilientWebSocket {
 		let isAwake = this._stayAwaker.isAwake()
 		let recentActivity = (Date.now() - this._lastMessageActivity) < THREE_HOURS_IN_MILLIS
 		return isAwake && recentActivity
+	}
+
+	_startPinging() {
+		//aws api gateway times out socket after 10 mins of idle, so send ping every 5 mins to keep it alive
+		setInterval(() => {
+			if (this._shouldReconnect()) {
+				this._ping()
+			}
+			//don't clear the interval if currently asleep, as it may just be that the tab has been temporarily hidden
+		}, FIVE_MINS_IN_MILLIS)
+	}
+
+	_ping() {
+		//send directly, don't record this as 'last activity'
+		this._socket.send(JSON.stringify({
+			action: actionPing
+		}))
 	}
 
 	send(message) {

@@ -6,7 +6,7 @@ import { WebSocketApi, WebSocketStage } from '@aws-cdk/aws-apigatewayv2'
 import { WebSocketLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations'
 
 import { TABLE_SCHEMA } from '../src/constants.js'
-import { actionSendMessage, actionGetPoolId } from '../../ui-additions/src/constants.js'
+import { actionSendMessage, actionGetPoolId, actionPing } from '../../ui-additions/src/constants.js'
 
 class DeployStack extends Stack {
 	constructor(scope, id, props) {
@@ -28,6 +28,7 @@ class DeployStack extends Stack {
 		const disconnectHandler = this._buildHandler('disconnectHandler', 'src/handlers/disconnect.js', sessionStore)
 		const messageHandler = this._buildHandler('messageHandler', 'src/handlers/message.js', sessionStore)
 		const getPoolIdHandler = this._buildHandler('getPoolIdHandler', 'src/handlers/get-pool-id.js', sessionStore)
+		const pingHandler = this._buildHandler('pingHandler', 'src/handlers/ping.js', sessionStore)
 
 		const webSocketApi = new WebSocketApi(this, 'webSocketApi', {
 			apiName: `${Aws.STACK_NAME}-webSocketApi`,
@@ -39,6 +40,10 @@ class DeployStack extends Stack {
 		})
 		webSocketApi.addRoute(actionGetPoolId, {
 			integration: new WebSocketLambdaIntegration('getPoolIdIntegration', getPoolIdHandler)
+		})
+		webSocketApi.addRoute(actionPing, {
+			//do nothing, just here so clients can keep the connection alive
+			integration: new WebSocketLambdaIntegration('pingIntegration', pingHandler)
 		})
 
 		const webSocketStage = new WebSocketStage(this, 'webSocketStage', {
