@@ -1,4 +1,4 @@
-import {stayAwake} from './awake.js'
+import {StayAwake} from './awake.js'
 import {Components} from './components.js'
 import {listenForChanges} from './pdf-integration.js'
 import {Comms} from './comms.js'
@@ -12,12 +12,13 @@ class UiAdditions {
 	}
 
 	async init() {
-		await stayAwake()
+		const stayAwaker = new StayAwake()
+		await stayAwaker.init()
 		if (this._webSocketBase != null && this._webSocketBase.length > 0) {
 			const sharer = new Sharer(this._urlUtils)
 			const components = new Components(this._urlUtils, sharer)
 			this._joinToken = this._urlUtils.getJoinToken()
-			const comms = new Comms(this._urlUtils, components)
+			const comms = new Comms(stayAwaker, this._urlUtils)
 			try {
 				await comms.waitForSocketReady()
 				components.build()
