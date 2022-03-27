@@ -1,7 +1,7 @@
-const CopyWebpackPlugin = require('copy-webpack-plugin')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const path = require('path')
+import CopyWebpackPlugin from 'copy-webpack-plugin'
+import HtmlWebpackPlugin from 'html-webpack-plugin'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import path from 'path'
 
 //the viewer doesn't by default allow cross-origin pdf loads - this change undoes that restriction
 const hostedOriginReplacer = (content, absoluteFrom) => {
@@ -14,16 +14,16 @@ const hostedOriginReplacer = (content, absoluteFrom) => {
 	}
 }
 
-module.exports = {
+export default {
 	mode: 'development',
 	output: {
-		path: path.resolve(__dirname, 'dist/web'),
+		path: path.resolve('dist/web'),
 	},
 	plugins: [
 		new CopyWebpackPlugin({
 			patterns: [
 				{
-					context: path.resolve(__dirname, "public"),
+					context: path.resolve("public"),
 					from: "**/*",
 					to: "..",
 					globOptions: {
