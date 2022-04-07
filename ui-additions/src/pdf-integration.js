@@ -1,5 +1,8 @@
 import {fileParam} from './constants.js'
 
+const SCROLL_MODE_PAGE = 3 // copied from https://github.com/mozilla/pdf.js/blob/3635a9a3338feb0049be4f1521d5a5afd173a832/web/ui_utils.js#L67 but I can't work out how to bring this in properly via webpack
+const SPREAD_MODE_NONE = 0 // copied from https://github.com/mozilla/pdf.js/blob/3635a9a3338feb0049be4f1521d5a5afd173a832/web/ui_utils.js#L72
+
 export function listenForChanges(comms) {
 	if (PDFViewerApplication.initializedPromise != undefined) {
 		_waitForPromise(comms)
@@ -74,14 +77,20 @@ export function getCurrentFile() {
 export function loadPdfFromParams(page = null, position = null) {
 	let file = new URLSearchParams(location.hash).get(fileParam)
 	if (file != null && file.length > 0) {
-		if (page != null) {
-			//if page is specified, wait until the file has been loaded before attempting to change page
-			PDFViewerApplication.eventBus.on('pagesloaded', () => {
+		//wait until the file is loaded before attempting to do anything with it
+		PDFViewerApplication.eventBus.on('pagesloaded', () => {
+			if (PDFViewerApplication.pdfViewer.isInPresentationMode) {
+				//for some reason when changing files while in presentation mode, the rendering gets screwed, this is an attempt to get it back
+				PDFViewerApplication.pdfViewer.scrollMode = SCROLL_MODE_PAGE
+				PDFViewerApplication.pdfViewer.spreadMode = SPREAD_MODE_NONE
+				PDFViewerApplication.pdfViewer.currentScaleValue = "page-fit"
+			}
+			if (page != null) {
 				changePage(page, position)
-			}, {
-				once: true
-			})
-		}
+			}
+		}, {
+			once: true
+		})
 		PDFViewerApplication.open(file)
 	}
 }
