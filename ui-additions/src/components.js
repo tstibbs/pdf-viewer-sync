@@ -2,9 +2,10 @@ import './additions.css'
 import {changePage} from './pdf-integration.js'
 
 export class Components {
-	constructor(urlUtils, sharer) {
+	constructor(urlUtils, sharer, comms) {
 		this._urlUtils = urlUtils
 		this._sharer = sharer
+		this._comms = comms
 	}
 
 	build() {
@@ -14,6 +15,9 @@ export class Components {
 		this._addSharePanel()
 		this._addShareButton()
 		this._listenForClicks()
+		this._comms.onClientJoined(() => {
+			this._hideSharePanel()
+		})
 	}
 
 	_addJoinPanel() { //add panel that shows if you're joining a pool
@@ -34,10 +38,12 @@ export class Components {
 		this._positionInput = document.querySelector('input[name="position"]')
 		this._joinCloseButton = document.getElementById('sync-join-close')
 		this._joinCloseButton.addEventListener('click', () => {
-			this._urlUtils.updatePosition(this._positionInput.value)
+			let position = this._positionInput.value
+			this._urlUtils.updatePosition(position)
 			//trigger it to update now we have the correct position info
 			changePage(this._urlUtils.getStartingPage(), this._urlUtils.getPosition())
 			this._hideJoinPanel()
+			this._comms.sendJoined(position)
 		})
 	}
 

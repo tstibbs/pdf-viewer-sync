@@ -1,10 +1,23 @@
-import {apiGatewayJoinTokenParam, messageTypeChangePage, actionSendMessage, actionGetPoolId, messageTypeLoadFile} from './constants.js'
+import UAParser from 'ua-parser-js'
+
+import {Notifier} from './notifier.js'
+import {
+	apiGatewayJoinTokenParam,
+	messageTypeChangePage,
+	actionSendMessage,
+	actionGetPoolId,
+	messageTypeLoadFile,
+	messageTypeClientJoined,
+	messageTypePoolId
+} from './constants.js'
 import {changePage, loadPdfFromParams, getCurrentPage} from './pdf-integration.js'
 import {ResilientWebSocket} from './websocket.js'
 
 export class Comms {
 
 	constructor(stayAwaker, urlUtils) {
+		this._uaParser = new UAParser()
+		this._notifier = new Notifier()
 		this._urlUtils = urlUtils
 		// initialise such that we don't publish a 'page change' event when we load the file and switch to the right page
 		this._lastRecievedPageNumber = this._urlUtils.getStartingPage + this._urlUtils.getPosition()
@@ -57,6 +70,14 @@ export class Comms {
 		this._sendMessage(actionSendMessage, data)
 	}
 
+	_sendClientJoined(clientData) {
+		let data = {
+			type: messageTypeClientJoined,
+			value: clientData
+		}
+		this._sendMessage(actionSendMessage, data)
+	}
+
 	_sendMessage(action, data) {
 		let message = {
 			action
@@ -68,20 +89,35 @@ export class Comms {
 	}
 
 	_handleMessage(data) {
-		if (data.poolId !== undefined) {
-			this._joinToken = data.poolId
+		console.log(`message recieved: ${JSON.stringify(data)}`)
+		switch (data.type) {
+			case messageTypePoolId:
+				this._recievedPoolId(data.value)
+				break;
+			case messageTypeChangePage:
+				this._recievedPageChange(data.value)
+				break;
+			case messageTypeLoadFile:
+				this._recievedLoadFile(data.value)
+				break;
+			case messageTypeClientJoined:
+				this._recievedClientJoined(data.value)
+				break;
+			default:
+				console.error('Unexpected data type: ' + data.type)
+		}
+	}
+
+	_recievedPoolId(value) {
+		const poolId = value
+		if (poolId == undefined) {
+			console.error(`Malformed pool id message, poolId=${poolId}`)
+		} else {
+			this._joinToken = poolId
 			console.log(`New join token: ${this._joinToken}`)
 			this._urlUtils.updateJoinToken(this._joinToken)
 			this._poolSetUpResolver() // join token recieved, so we're ready to share now
 			this._socket.updateUrl(this._buildWebsocketUrl())
-		} else if (data.type === messageTypeChangePage) {
-			console.log(`message recieved: ${JSON.stringify(data)}`)
-			this._recievedPageChange(data.value)
-		} else if (data.type === messageTypeLoadFile) {
-			console.log(`message recieved: ${JSON.stringify(data)}`)
-			this._recievedLoadFile(data.value)
-		} else {
-			console.error('Unexpected data type: ' + JSON.stringify(data))
 		}
 	}
 
@@ -99,6 +135,15 @@ export class Comms {
 		this._lastRecievedPageNumber = page + position
 		this._urlUtils.updateFile(file)
 		loadPdfFromParams(page, position)
+	}
+
+	_recievedClientJoined(message) {
+		this._notifier.showMessage(message)
+		this._onClientJoinedListener()
+	}
+
+	onClientJoined(listener) {
+		this._onClientJoinedListener = listener
 	}
 
 	async waitForSocketReady() {
@@ -123,5 +168,21 @@ export class Comms {
 			await this.waitForSocketReady()
 			this._sendLoadFile(file)
 		}
+	}
+
+	async sendJoined(position) {
+		await this.waitForSocketReady()
+		const message = `Client joined at position ${position} on ${this._buildDeviceDescription()}`
+		this._sendClientJoined(message)
+	}
+
+	_buildDeviceDescription() {
+		const {browser, os, device} = this._uaParser.getResult()
+		let deviceDescription = `${browser.name} for ${os.name}`
+		let physicalDeviceInfo = `${device.vendor ?? ''} ${device.model ?? ''}`.trim()
+		if (physicalDeviceInfo.length > 0) {
+			deviceDescription = `${deviceDescription} on ${physicalDeviceInfo}`
+		}
+		return deviceDescription
 	}
 }

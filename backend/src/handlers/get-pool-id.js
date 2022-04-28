@@ -1,5 +1,6 @@
 import {aws} from '../utils'
-import { getPoolId } from '../persistance.js'
+import {getPoolId} from '../persistance.js'
+import {messageTypePoolId} from '../../../ui-additions/src/constants.js'
 
 export async function handler(event) {
 	console.log(JSON.stringify(event, null, 2))
@@ -11,8 +12,8 @@ export async function handler(event) {
 
 	const sendPoolId = async poolId => {
 		let data = {
-			type: 'poolId',
-			poolId: poolId
+			type: messageTypePoolId,
+			value: poolId
 		}
 		await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: JSON.stringify(data) }).promise()
 	}

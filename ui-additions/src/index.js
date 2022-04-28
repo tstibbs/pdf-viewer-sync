@@ -16,9 +16,8 @@ class UiAdditions {
 		await stayAwaker.init()
 		if (this._webSocketBase != null && this._webSocketBase.length > 0) {
 			const sharer = new Sharer(this._urlUtils)
-			const components = new Components(this._urlUtils, sharer)
-			this._joinToken = this._urlUtils.getJoinToken()
 			const comms = new Comms(stayAwaker, this._urlUtils)
+			const components = new Components(this._urlUtils, sharer, comms)
 			try {
 				await comms.waitForSocketReady()
 				components.build()
