@@ -17,12 +17,12 @@ export class ResilientWebSocket {
 		this._socketReadyPromise = new Promise((resolve, reject) => {
 			this._socket.onerror = (event) => {
 				console.log('socket error')
-				console.log(error)
+				console.log(event)
 				reject(event) //this won't do anything if the promise is already resolved
 			}
 			this._socket.onclose = event => {
 				console.log('socket close')
-				console.log('error')
+				console.log(event)
 				reject(event) //this won't do anything if the promise is already resolved
 				this._closeSocket()
 				if (this._shouldReconnect()) {
