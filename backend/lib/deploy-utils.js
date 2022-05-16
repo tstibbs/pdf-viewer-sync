@@ -1,7 +1,21 @@
-import cdk from '@aws-cdk/core'
+import {App, Duration} from '@aws-cdk/core'
+import {NodejsFunction} from '@aws-cdk/aws-lambda-nodejs'
+import {Runtime} from '@aws-cdk/aws-lambda'
+
 import {DeployStack} from '../lib/deploy-stack.js'
 
 export function buildStack(stackName) {
-	const app = new cdk.App()
+	const app = new App()
 	return new DeployStack(app, stackName)
+}
+
+export function buildGenericHandler(stack, name, entry, envs) {
+	const handler = new NodejsFunction(stack, name, {
+		entry: `src/handlers/${entry}.js`,
+		memorySize: 128,
+		timeout: Duration.seconds(20),
+		runtime: Runtime.NODEJS_14_X,
+		environment: envs
+	})
+	return handler
 }

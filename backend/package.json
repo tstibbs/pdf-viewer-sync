@@ -7,11 +7,13 @@
 		"dotenv": "^16.0.0"
 	},
 	"devDependencies": {
+		"@aws-cdk/aws-apigateway": "^1.148.0",
 		"@aws-cdk/aws-apigatewayv2": "^1.148.0",
 		"@aws-cdk/aws-apigatewayv2-integrations": "^1.148.0",
 		"@aws-cdk/aws-dynamodb": "^1.148.0",
 		"@aws-cdk/aws-lambda": "^1.148.0",
 		"@aws-cdk/aws-lambda-nodejs": "^1.148.0",
+		"@aws-cdk/aws-s3": "^1.148.0",
 		"@aws-cdk/core": "^1.148.0",
 		"@tstibbs/cloud-core-utils": "file:../../cloud-core/aws/utils",
 		"aws-cdk": "^1.148.0",
