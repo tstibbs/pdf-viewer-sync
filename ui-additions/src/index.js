@@ -6,20 +6,22 @@ import {Sharer} from './sharer.js'
 import {UrlUtils} from './url-utils.js'
 
 class UiAdditions {
+	#endpoint
+
 	constructor() {
 		this._urlUtils = new UrlUtils()
-		this._webSocketBase = this._urlUtils.getWebSocketBase()
+		this.#endpoint = this._urlUtils.getEndpoint()
 	}
 
 	async init() {
 		const stayAwaker = new StayAwake()
 		await stayAwaker.init()
-		if (this._webSocketBase != null && this._webSocketBase.length > 0) {
+		if (this.#endpoint != null && this.#endpoint.length > 0) {
 			const sharer = new Sharer(this._urlUtils)
 			const comms = new Comms(stayAwaker, this._urlUtils)
 			const components = new Components(this._urlUtils, sharer, comms)
 			try {
-				await comms.waitForSocketReady()
+				await comms.init()
 				components.build()
 				listenForChanges(comms)
 			} catch (e) {
@@ -27,7 +29,7 @@ class UiAdditions {
 				console.error(e)
 			}
 		} else {
-			console.log("Not enabling share feature, empty websocket url provided - set the 'websocket' URL param to the full URL of the websocket.")
+			console.log("Not enabling share feature, empty endpoint url provided - set the 'endpoint' URL param to the full URL of the api gateway endpoint.")
 		}
 	}
 }

@@ -43,11 +43,14 @@ function _waitForPromise(comms) {
 		//listed for the new pdf being loaded - this is seperate to the above to make sure that the pdf is valid/accessible first
 		PDFViewerApplication.eventBus.on('pagesloaded', () => {
 			const file = PDFViewerApplication.url
-			if (_isValidUrl(file)) {
-				console.log(`file changed to ${file}`)
-				comms.sendLoadFile(file)
-			} else {
-				console.log(`file changed to ${file} - not sending change to clients as not valid URL`)
+			if (file != 'compressed.tracemonkey-pldi-09.pdf') { //this is the default file that gets loaded on startup, so ignore
+				if (_isValidUrl(file)) {
+					console.log(`file changed to ${file}, telling clients to load that URL`)
+					comms.sendLoadFile(file)
+				} else {
+					console.log(`file changed to ${file}, not a valid URL so uploading file ready to share`)
+					uploadFileAndShare(file, comms)
+				}
 			}
 		})
 
@@ -58,6 +61,13 @@ function _waitForPromise(comms) {
 			comms.sendPageChange(pageNumber)
 		})
 	})
+}
+
+function uploadFileAndShare(fileName, comms) {
+	//don't wait for the data to be available, so that we don't block the rendering of the PDF
+	PDFViewerApplication.pdfViewer.pdfDocument.getData().then(data => {
+		comms.uploadFileAndShare(fileName, data)
+	}, 1)
 }
 
 export function changePage(pageNumber, position) {

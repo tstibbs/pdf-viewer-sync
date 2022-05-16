@@ -1,4 +1,4 @@
-import {joinTokenParam, webSocketParam, positionParam, pageParam, fileParam} from './constants.js'
+import {joinTokenParam, endpointParam, positionParam, pageParam, fileParam} from './constants.js'
 import {getCurrentPage, getCurrentFile} from './pdf-integration.js'
 
 export class UrlUtils {
@@ -6,7 +6,7 @@ export class UrlUtils {
 		this._urlParams = this._parseHash(location.hash)
 		this._joinToken = this._urlParams.get(joinTokenParam)
 		this._position = this._urlParams.get(positionParam)
-		this._webSocketBase = this._urlParams.get(webSocketParam)
+		this._endpoint = this._urlParams.get(endpointParam)
 		this._startingPage = this._urlParams.get(pageParam)
 		this._file = this._urlParams.get(fileParam)
 		this._viewerBase = new URL(location.pathname, location.href).href
@@ -68,8 +68,8 @@ export class UrlUtils {
 		return this._joinToken
 	}
 
-	getWebSocketBase() {
-		return this._webSocketBase
+	getEndpoint() {
+		return this._endpoint
 	}
 
 	getPosition() {

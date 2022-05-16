@@ -5,17 +5,19 @@ import {
 	apiGatewayJoinTokenParam,
 	messageTypeChangePage,
 	actionSendMessage,
-	actionGetPoolId,
 	messageTypeLoadFile,
-	messageTypeClientJoined,
-	messageTypePoolId
+	messageTypeClientJoined
 } from './constants.js'
 import {changePage, loadPdfFromParams, getCurrentPage} from './pdf-integration.js'
 import {ResilientWebSocket} from './websocket.js'
+import {ApiInterface} from './api-interface.js'
 
 export class Comms {
+	#stayAwaker
+	#apiInterface
 
 	constructor(stayAwaker, urlUtils) {
+		this.#stayAwaker = stayAwaker
 		this._uaParser = new UAParser()
 		this._notifier = new Notifier()
 		this._urlUtils = urlUtils
@@ -24,31 +26,17 @@ export class Comms {
 		// initialise such that we don't publish a 'file change' event when we load the file
 		this._lastRecievedFileLoad = this._urlUtils.getFile()
 		this._joinToken = this._urlUtils.getJoinToken()
-		this._webSocketBase = this._urlUtils.getWebSocketBase()
-		if (this._joinToken != null) {
-			this._poolSetUpPromise = new Promise(resolve => {
-				this._poolSetUpResolver = resolve
-			})
-		} else {
-			this._poolSetUpPromise = Promise.resolve()
-			this._poolSetUpResolver = () => {}
-		}
-		this._socket = new ResilientWebSocket(this._buildWebsocketUrl(), this._handleMessage.bind(this), stayAwaker)
-		this._socket.waitForSocketReady().then(() => { //no need to make the constructor wait
-			this._sendGetPoolId()
-		})
+		const endpoint = this._urlUtils.getEndpoint()
+		this.#apiInterface = new ApiInterface(this._joinToken, endpoint)
 	}
 
-	_buildWebsocketUrl() {
-		if (this._joinToken != null) {
-			return `${this._webSocketBase}?${apiGatewayJoinTokenParam}=${this._joinToken}`
-		} else {
-			return this._webSocketBase
-		}
-	}
-
-	_sendGetPoolId() {
-		this._sendMessage(actionGetPoolId)
+	async init() {
+		let joinInfo = await this.#apiInterface.fetchJoinInfo()
+		this._joinToken = joinInfo.poolId
+		const websocketUrl = `${joinInfo.webSocketUrl}?${apiGatewayJoinTokenParam}=${this._joinToken}`
+		this._urlUtils.updateJoinToken(this._joinToken)
+		this._socket = new ResilientWebSocket(websocketUrl, this._handleMessage.bind(this), this.#stayAwaker)
+		await this.waitForSocketReady()
 	}
 
 	_sendChangePage(pageNumber) {
@@ -91,9 +79,6 @@ export class Comms {
 	_handleMessage(data) {
 		console.log(`message recieved: ${JSON.stringify(data)}`)
 		switch (data.type) {
-			case messageTypePoolId:
-				this._recievedPoolId(data.value)
-				break;
 			case messageTypeChangePage:
 				this._recievedPageChange(data.value)
 				break;
@@ -105,19 +90,6 @@ export class Comms {
 				break;
 			default:
 				console.error('Unexpected data type: ' + data.type)
-		}
-	}
-
-	_recievedPoolId(value) {
-		const poolId = value
-		if (poolId == undefined) {
-			console.error(`Malformed pool id message, poolId=${poolId}`)
-		} else {
-			this._joinToken = poolId
-			console.log(`New join token: ${this._joinToken}`)
-			this._urlUtils.updateJoinToken(this._joinToken)
-			this._poolSetUpResolver() // join token recieved, so we're ready to share now
-			this._socket.updateUrl(this._buildWebsocketUrl())
 		}
 	}
 
@@ -147,8 +119,8 @@ export class Comms {
 	}
 
 	async waitForSocketReady() {
-		let underlyingSocketPromise = this._socket.waitForSocketReady()
-		await Promise.all([underlyingSocketPromise, this._poolSetUpPromise])
+		//socket will be ready by the time we try to use it, because init waits for this, however subsequent attempts to reconnect could make it 'unready'
+		await this._socket.waitForSocketReady()
 	}
 
 	async sendPageChange(pageNumber) {
@@ -184,5 +156,11 @@ export class Comms {
 			deviceDescription = `${deviceDescription} on ${physicalDeviceInfo}`
 		}
 		return deviceDescription
+	}
+
+	async uploadFileAndShare(fileName, data) {
+		await this.waitForSocketReady()
+		let shareUrl = await this.#apiInterface.uploadFile(fileName, data)
+		await this.sendLoadFile(shareUrl)
 	}
 }
