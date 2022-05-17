@@ -1,11 +1,17 @@
 import {Aws, Stack, RemovalPolicy, CfnOutput} from '@aws-cdk/core'
 import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations'
-import {HttpApi, HttpMethod} from '@aws-cdk/aws-apigatewayv2'
-import {Bucket} from '@aws-cdk/aws-s3'
+import {HttpApi, HttpMethod, CorsHttpMethod} from '@aws-cdk/aws-apigatewayv2'
+import {Bucket, HttpMethods} from '@aws-cdk/aws-s3'
+import {PolicyStatement} from '@aws-cdk/aws-iam'
 
 import {buildCommsLayer} from './commsLayer.js'
 import {buildGenericHandler} from './deploy-utils.js'
 import {endpointGetJoinInfo, endpointGetItemUrls} from '../../ui-additions/src/constants.js'
+
+const allowedOrigins = [
+	'https://tstibbs.github.io', //where the UI actually gets deployed
+	'http://localhost:8080' //for dev testing
+]
 
 class DeployStack extends Stack {
 	#webSocketUrl
@@ -19,11 +25,22 @@ class DeployStack extends Stack {
 
 		this.#bucket = new Bucket(this, 'filesBucket', {
 			removalPolicy: RemovalPolicy.DESTROY,
+			cors: [{
+				allowedMethods: [HttpMethods.GET, HttpMethods.PUT],
+				allowedOrigins: allowedOrigins,
+				allowedHeaders: ['Content-Type'],
+			}],
 			autoDeleteObjects: true
 		})
 
 		this.#httpApi = new HttpApi(this, 'httpApi', {
-			apiName: `${Aws.STACK_NAME}-httpApi`
+			apiName: `${Aws.STACK_NAME}-httpApi`,
+			corsPreflight: {
+				allowMethods: [
+					CorsHttpMethod.GET
+				],
+				allowOrigins: allowedOrigins
+			},
 		})
 		this.buildHandler(endpointGetJoinInfo, 'get-join-info')
 		this.buildHandler(endpointGetItemUrls, 'get-item-urls')
@@ -35,6 +52,12 @@ class DeployStack extends Stack {
 			WEB_SOCKET_URL: this.#webSocketUrl,
 			BUCKET: this.#bucket.bucketName
 		})
+		handler.addToRolePolicy(new PolicyStatement({
+			resources: [
+				this.#bucket.arnForObjects('*') //"arn:aws:s3:::bucketname/*"
+			],
+			actions: ['s3:GetObject', 's3:PutObject']
+		}))
 		let integration = new HttpLambdaIntegration(`${name}-integration`, handler)
 		this.#httpApi.addRoutes({
 			path: `/${name}`,
