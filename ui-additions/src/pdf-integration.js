@@ -80,10 +80,6 @@ export function getCurrentPage() {
 	return PDFViewerApplication.page
 }
 
-export function getCurrentFile() {
-	return PDFViewerApplication.url
-}
-
 export function loadPdfFromParams(page = null, position = null) {
 	let file = new URLSearchParams(location.hash).get(fileParam)
 	if (file != null && file.length > 0) {

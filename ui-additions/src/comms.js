@@ -135,6 +135,7 @@ export class Comms {
 	}
 
 	async sendLoadFile(file) {
+		this._urlUtils.updateFile(file)
 		if (file != this._lastRecievedFileLoad) { //attempt to prevent infinite loop from events firing for changes we previously recieved
 			this._lastRecievedPageNumber = null
 			await this.waitForSocketReady()

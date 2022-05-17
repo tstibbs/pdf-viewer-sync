@@ -1,5 +1,5 @@
 import {joinTokenParam, endpointParam, positionParam, pageParam, fileParam} from './constants.js'
-import {getCurrentPage, getCurrentFile} from './pdf-integration.js'
+import {getCurrentPage} from './pdf-integration.js'
 
 export class UrlUtils {
 	constructor() {
@@ -42,6 +42,7 @@ export class UrlUtils {
 	}
 
 	updateFile(file) {
+		//note this update may be delayed, as it will only happen after the file has been uploaded, if that's required
 		this._file = file
 		this._urlParams.set(fileParam, this._file)
 		this._updateMyUrl()
@@ -56,7 +57,6 @@ export class UrlUtils {
 		let clientParams = new URLSearchParams(this._urlParams.toString()) //clone url params so we can modify before passing on
 		clientParams.delete(positionParam) // don't want to set a position for clients, let them choose it
 		clientParams.set(pageParam, this._fetchCurrentPage())
-		clientParams.set(fileParam, getCurrentFile()) // ensure we're getting the latest, don't bother trying to track URL changes just to avoid this
 		return this._generateUrl(clientParams)
 	}
 
