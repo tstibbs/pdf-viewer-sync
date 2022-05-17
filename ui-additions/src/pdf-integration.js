@@ -41,7 +41,7 @@ function _waitForPromise(comms) {
 		})
 
 		//listed for the new pdf being loaded - this is seperate to the above to make sure that the pdf is valid/accessible first
-		PDFViewerApplication.eventBus.on('pagesloaded', () => {
+		PDFViewerApplication.eventBus.on('documentloaded', () => { // the doc may not be rendered on the first client yet, but doesn't hurt to get the others working on loading it regardless
 			const file = PDFViewerApplication.url
 			if (file != 'compressed.tracemonkey-pldi-09.pdf') { //this is the default file that gets loaded on startup, so ignore
 				if (_isValidUrl(file)) {
