@@ -84,19 +84,27 @@ export function loadPdfFromParams(page = null, position = null) {
 	let file = new URLSearchParams(location.hash).get(fileParam)
 	if (file != null && file.length > 0) {
 		//wait until the file is loaded before attempting to do anything with it
-		PDFViewerApplication.eventBus.on('pagesloaded', () => {
-			if (PDFViewerApplication.pdfViewer.isInPresentationMode) {
-				//for some reason when changing files while in presentation mode, the rendering gets screwed, this is an attempt to get it back
-				PDFViewerApplication.pdfViewer.scrollMode = SCROLL_MODE_PAGE
-				PDFViewerApplication.pdfViewer.spreadMode = SPREAD_MODE_NONE
-				PDFViewerApplication.pdfViewer.currentScaleValue = "page-fit"
-			}
-			if (page != null) {
+		if (page != null) {
+			PDFViewerApplication.eventBus.on('pagesloaded', () => {
 				changePage(page, position)
-			}
-		}, {
-			once: true
-		})
+			}, {
+				once: true
+			})
+		}
+		if (PDFViewerApplication.pdfViewer.isInPresentationMode) {
+			PDFViewerApplication.eventBus.on('pagerendered', () => {
+				//for some reason when changing files while in presentation mode, the rendering gets screwed, this is an attempt to get it back
+				PDFViewerApplication.pdfViewer.spreadMode = 2 //pretty much any other value
+				//delay the change back to give it chance to be re-rendered
+				setTimeout(() => {
+					PDFViewerApplication.pdfViewer.scrollMode = SCROLL_MODE_PAGE
+					PDFViewerApplication.pdfViewer.spreadMode = SPREAD_MODE_NONE
+					PDFViewerApplication.pdfViewer.currentScaleValue = "page-fit"
+				}, 0)
+			}, {
+				once: true
+			})
+		}
 		PDFViewerApplication.open(file)
 	}
 }
