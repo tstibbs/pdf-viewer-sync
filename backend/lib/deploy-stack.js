@@ -1,4 +1,4 @@
-import {Aws, Stack, RemovalPolicy, CfnOutput} from '@aws-cdk/core'
+import {Aws, Stack, RemovalPolicy, CfnOutput, Duration} from '@aws-cdk/core'
 import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations'
 import {HttpApi, HttpMethod, CorsHttpMethod} from '@aws-cdk/aws-apigatewayv2'
 import {Bucket, HttpMethods} from '@aws-cdk/aws-s3'
@@ -30,7 +30,17 @@ class DeployStack extends Stack {
 				allowedOrigins: allowedOrigins,
 				allowedHeaders: ['Content-Type'],
 			}],
-			autoDeleteObjects: true
+			autoDeleteObjects: true,
+			lifecycleRules: [
+				{
+					id: 'expire',
+					expiration: Duration.days(1)
+				},
+				{
+					id: 'cleanup',
+					abortIncompleteMultipartUploadAfter: Duration.days(1)
+				}
+			]
 		})
 
 		this.#httpApi = new HttpApi(this, 'httpApi', {
