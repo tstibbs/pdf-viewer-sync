@@ -10,6 +10,7 @@ import {actionSendMessage, actionPing} from '../../ui-additions/src/constants.js
 export function buildCommsLayer(stack) {
 	const sessionStore = new Table(stack, 'sessionStore', {
 		partitionKey: { name: TABLE_SCHEMA.pk, type: AttributeType.STRING },
+		timeToLiveAttribute: TABLE_SCHEMA.ttl,
 		removalPolicy: RemovalPolicy.DESTROY
 	})
 	sessionStore.addGlobalSecondaryIndex({
