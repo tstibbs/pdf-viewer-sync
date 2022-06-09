@@ -1,8 +1,8 @@
-import {Aws, Stack, RemovalPolicy, CfnOutput, Duration} from '@aws-cdk/core'
-import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations'
-import {HttpApi, HttpMethod, CorsHttpMethod} from '@aws-cdk/aws-apigatewayv2'
-import {Bucket, HttpMethods} from '@aws-cdk/aws-s3'
-import {PolicyStatement} from '@aws-cdk/aws-iam'
+import {Aws, Stack, RemovalPolicy, CfnOutput, Duration} from 'aws-cdk-lib'
+import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alpha'
+import {HttpApi, HttpMethod, CorsHttpMethod} from '@aws-cdk/aws-apigatewayv2-alpha'
+import {Bucket, HttpMethods} from 'aws-cdk-lib/aws-s3'
+import {PolicyStatement} from 'aws-cdk-lib/aws-iam'
 
 import {buildCommsLayer} from './commsLayer.js'
 import {buildGenericHandler} from './deploy-utils.js'

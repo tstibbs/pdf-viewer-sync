@@ -1,7 +1,7 @@
-import {Aws, RemovalPolicy} from '@aws-cdk/core'
-import {Table, AttributeType} from '@aws-cdk/aws-dynamodb'
-import {WebSocketApi, WebSocketStage} from '@aws-cdk/aws-apigatewayv2'
-import {WebSocketLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations'
+import {Aws, RemovalPolicy} from 'aws-cdk-lib'
+import {Table, AttributeType} from 'aws-cdk-lib/aws-dynamodb'
+import {WebSocketApi, WebSocketStage} from '@aws-cdk/aws-apigatewayv2-alpha'
+import {WebSocketLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alpha'
 
 import {buildGenericHandler} from './deploy-utils.js'
 import {TABLE_SCHEMA} from '../src/constants.js'

@@ -1,6 +1,6 @@
-import {App, Duration} from '@aws-cdk/core'
-import {NodejsFunction} from '@aws-cdk/aws-lambda-nodejs'
-import {Runtime} from '@aws-cdk/aws-lambda'
+import {App, Duration} from 'aws-cdk-lib'
+import {NodejsFunction} from 'aws-cdk-lib/aws-lambda-nodejs'
+import {Runtime} from 'aws-cdk-lib/aws-lambda'
 
 import {DeployStack} from '../lib/deploy-stack.js'
 
