@@ -4,6 +4,8 @@ import {HttpApi, HttpMethod, CorsHttpMethod} from '@aws-cdk/aws-apigatewayv2-alp
 import {Bucket, HttpMethods} from 'aws-cdk-lib/aws-s3'
 import {PolicyStatement} from 'aws-cdk-lib/aws-iam'
 
+import {applyStandardTags} from '@tstibbs/cloud-core-utils'
+
 import {buildCommsLayer} from './commsLayer.js'
 import {buildGenericHandler} from './deploy-utils.js'
 import {endpointGetJoinInfo, endpointGetItemUrls} from '../../ui-additions/src/constants.js'
@@ -55,6 +57,8 @@ class DeployStack extends Stack {
 		this.buildHandler(endpointGetJoinInfo, 'get-join-info')
 		this.buildHandler(endpointGetItemUrls, 'get-item-urls')
 		new CfnOutput(this, 'apiUrl', { value: this.#httpApi.url })
+
+		applyStandardTags(this)
 	}
 
 	buildHandler(name, entry) {
