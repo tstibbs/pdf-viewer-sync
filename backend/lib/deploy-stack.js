@@ -1,10 +1,12 @@
-import {Aws, Stack, RemovalPolicy, CfnOutput, Duration} from 'aws-cdk-lib'
+import {Aws, Stack, RemovalPolicy, CfnOutput, Duration, Fn} from 'aws-cdk-lib'
+import {CfnAccount} from 'aws-cdk-lib/aws-apigateway'
 import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alpha'
 import {HttpApi, HttpMethod, CorsHttpMethod} from '@aws-cdk/aws-apigatewayv2-alpha'
 import {Bucket, HttpMethods} from 'aws-cdk-lib/aws-s3'
 import {PolicyStatement} from 'aws-cdk-lib/aws-iam'
 
 import {applyStandardTags} from '@tstibbs/cloud-core-utils'
+import {addUsageTrackingToHttpApi} from '@tstibbs/cloud-core-utils/src/stacks/usage-tracking.js'
 
 import {buildCommsLayer} from './commsLayer.js'
 import {buildGenericHandler} from './deploy-utils.js'
@@ -22,6 +24,11 @@ class DeployStack extends Stack {
 
 	constructor(scope, id, props) {
 		super(scope, id, props)
+
+		new CfnAccount(this, 'agiGatewayAccount', {
+			//use a centrally created role so that it doesn't get deleted when this stack is torn down
+			cloudWatchRoleArn: Fn.importValue('AllAccountsStack-apiGatewayCloudWatchRoleArn')
+		})
 
 		this.#webSocketUrl = buildCommsLayer(this)
 
@@ -54,6 +61,8 @@ class DeployStack extends Stack {
 				allowOrigins: allowedOrigins
 			},
 		})
+		addUsageTrackingToHttpApi(this.#httpApi, 'httpApiAccessLogs')
+
 		this.buildHandler(endpointGetJoinInfo, 'get-join-info')
 		this.buildHandler(endpointGetItemUrls, 'get-item-urls')
 		new CfnOutput(this, 'apiUrl', { value: this.#httpApi.url })
