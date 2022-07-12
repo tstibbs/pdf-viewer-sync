@@ -2,7 +2,7 @@ import {Aws, Stack, RemovalPolicy, CfnOutput, Duration, Fn} from 'aws-cdk-lib'
 import {CfnAccount} from 'aws-cdk-lib/aws-apigateway'
 import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alpha'
 import {HttpApi, HttpMethod, CorsHttpMethod} from '@aws-cdk/aws-apigatewayv2-alpha'
-import {Bucket, HttpMethods} from 'aws-cdk-lib/aws-s3'
+import {Bucket, HttpMethods, BucketEncryption} from 'aws-cdk-lib/aws-s3'
 import {PolicyStatement} from 'aws-cdk-lib/aws-iam'
 
 import {applyStandardTags} from '@tstibbs/cloud-core-utils'
@@ -39,6 +39,7 @@ class DeployStack extends Stack {
 				allowedOrigins: allowedOrigins,
 				allowedHeaders: ['Content-Type'],
 			}],
+			encryption: BucketEncryption.S3_MANAGED,
 			autoDeleteObjects: true,
 			lifecycleRules: [
 				{
