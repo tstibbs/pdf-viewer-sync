@@ -1,5 +1,11 @@
 import axios from 'axios'
-import {endpointGetJoinInfo, endpointGetItemUrls, endpointFileNameParam, endpointPoolIdParam, apiGatewayJoinTokenParam} from './constants.js'
+import {
+	endpointGetJoinInfo,
+	endpointGetItemUrls,
+	endpointFileNameParam,
+	endpointPoolIdParam,
+	apiGatewayJoinTokenParam
+} from './constants.js'
 
 export class ApiInterface {
 	#poolId

@@ -4,8 +4,8 @@ import toastr from 'toastr'
 export class Notifier {
 	constructor() {
 		toastr.options = {
-			"newestOnTop": true,
-			"positionClass": "toast-bottom-right"
+			newestOnTop: true,
+			positionClass: 'toast-bottom-right'
 		}
 	}
 

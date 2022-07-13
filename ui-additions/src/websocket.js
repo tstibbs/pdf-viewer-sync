@@ -4,7 +4,6 @@ const THREE_HOURS_IN_MILLIS = 3 * 60 * 60 * 1000
 const FIVE_MINS_IN_MILLIS = 5 * 60 * 1000
 
 export class ResilientWebSocket {
-
 	constructor(url, messageHandler, stayAwaker) {
 		this._url = url
 		this._messageHandler = messageHandler
@@ -15,7 +14,7 @@ export class ResilientWebSocket {
 	_createSocket() {
 		this._socket = new WebSocket(this._url)
 		this._socketReadyPromise = new Promise((resolve, reject) => {
-			this._socket.onerror = (event) => {
+			this._socket.onerror = event => {
 				console.log('socket error')
 				console.log(event)
 				reject(event) //this won't do anything if the promise is already resolved
@@ -40,7 +39,8 @@ export class ResilientWebSocket {
 
 			this._socket.onmessage = this._handleMessage.bind(this)
 		})
-		this._socketReadyPromise.then(() => {//no need to make this method wait for this
+		//no need to make this method wait for this
+		this._socketReadyPromise.then(() => {
 			this._startPinging()
 		})
 	}
@@ -58,7 +58,7 @@ export class ResilientWebSocket {
 
 	_shouldReconnect() {
 		let isAwake = this._stayAwaker.isAwake()
-		let recentActivity = (Date.now() - this._lastMessageActivity) < THREE_HOURS_IN_MILLIS
+		let recentActivity = Date.now() - this._lastMessageActivity < THREE_HOURS_IN_MILLIS
 		return isAwake && recentActivity
 	}
 
@@ -74,9 +74,11 @@ export class ResilientWebSocket {
 
 	_ping() {
 		//send directly, don't record this as 'last activity'
-		this._socket.send(JSON.stringify({
-			action: actionPing
-		}))
+		this._socket.send(
+			JSON.stringify({
+				action: actionPing
+			})
+		)
 	}
 
 	send(message) {
@@ -90,7 +92,8 @@ export class ResilientWebSocket {
 		this._messageHandler(data)
 	}
 
-	async waitForSocketReady() { //don't cache the result of this method as a socket reconnect could cause a new promise to be created
+	//don't cache the result of this method as a socket reconnect could cause a new promise to be created
+	async waitForSocketReady() {
 		await this._socketReadyPromise
 	}
 

@@ -81,20 +81,21 @@ export class Comms {
 		switch (data.type) {
 			case messageTypeChangePage:
 				this._recievedPageChange(data.value)
-				break;
+				break
 			case messageTypeLoadFile:
 				this._recievedLoadFile(data.value)
-				break;
+				break
 			case messageTypeClientJoined:
 				this._recievedClientJoined(data.value)
-				break;
+				break
 			default:
 				console.error('Unexpected data type: ' + data.type)
 		}
 	}
 
 	_recievedPageChange(pageNumber) {
-		if (this._urlUtils.isPositionSet()) { // if the user hasn't yet chosen a position param, ignore this event
+		// if the user hasn't yet chosen a position param, ignore this event
+		if (this._urlUtils.isPositionSet()) {
 			let position = this._urlUtils.getPosition()
 			this._lastRecievedPageNumber = pageNumber + position
 			changePage(pageNumber, position)
@@ -124,8 +125,10 @@ export class Comms {
 	}
 
 	async sendPageChange(pageNumber) {
-		if (this._urlUtils.isPositionSet()) { // if the user hasn't yet chosen a position param, ignore this event
-			if (pageNumber != this._lastRecievedPageNumber) { //attempt to prevent infinite loop from events firing for changes we previously recieved
+		// if the user hasn't yet chosen a position param, ignore this event
+		if (this._urlUtils.isPositionSet()) {
+			//attempt to prevent infinite loop from events firing for changes we previously recieved
+			if (pageNumber != this._lastRecievedPageNumber) {
 				pageNumber -= this._urlUtils.getPosition()
 				this._lastRecievedPageNumber = null
 				await this.waitForSocketReady()
@@ -136,7 +139,8 @@ export class Comms {
 
 	async sendLoadFile(file) {
 		this._urlUtils.updateFile(file)
-		if (file != this._lastRecievedFileLoad) { //attempt to prevent infinite loop from events firing for changes we previously recieved
+		if (file != this._lastRecievedFileLoad) {
+			//attempt to prevent infinite loop from events firing for changes we previously recieved
 			this._lastRecievedPageNumber = null
 			await this.waitForSocketReady()
 			this._sendLoadFile(file)

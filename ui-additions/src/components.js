@@ -20,7 +20,8 @@ export class Components {
 		})
 	}
 
-	_addJoinPanel() { //add panel that shows if you're joining a pool
+	_addJoinPanel() {
+		//add panel that shows if you're joining a pool
 		this._joinPanel = document.createElement('div')
 		this._joinPanel.id = 'sync-join-panel'
 		this._joinPanel.classList.add('sync-base-panel')
@@ -47,11 +48,12 @@ export class Components {
 		})
 	}
 
-	_addSharePanel() { //add share panel (hidden initially)
+	_addSharePanel() {
+		//add share panel (hidden initially)
 		this._sharePanel = document.createElement('div')
 		this._sharePanel.id = 'sync-share-panel'
 		this._sharePanel.classList.add('sync-base-panel')
-		this._sharePanel.style = "display: none"
+		this._sharePanel.style = 'display: none'
 		this._sharePanel.innerHTML = `
 		<div class="wrapper" id="sync-share-wrapper">
 			<div class="inner">
@@ -68,10 +70,11 @@ export class Components {
 		this._wrapper = document.querySelector('#sync-share-panel div.wrapper')
 	}
 
-	_addShareButton() { //add button to open share panel
+	_addShareButton() {
+		//add button to open share panel
 		this._openButton = document.createElement('button')
 		this._openButton.innerHTML = `<span>Share and Sync</span>`
-		this._openButton.title = "Share and Sync"
+		this._openButton.title = 'Share and Sync'
 		this._openButton.classList.add('toolbarButton')
 		this._openButton.classList.add('shareAndSync')
 		let presentationButton = document.getElementById('presentationMode')
@@ -80,7 +83,8 @@ export class Components {
 
 	_listenForClicks() {
 		this._sharePanel.addEventListener('click', event => {
-			if (event.target === this._sharePanel || event.target === this._wrapper) { //i.e. ignore clicks from child elements
+			if (event.target === this._sharePanel || event.target === this._wrapper) {
+				//i.e. ignore clicks from child elements
 				this._hideSharePanel()
 			}
 		})
@@ -93,17 +97,17 @@ export class Components {
 	}
 
 	_hideJoinPanel() {
-		this._joinPanel.style = "display: none"
+		this._joinPanel.style = 'display: none'
 	}
 
 	async _showSharePanel() {
 		let shareUrl = await this._sharer.showShareInfo(this._canvas)
 		this._link.href = shareUrl
 		this._link.text = shareUrl
-		this._sharePanel.style = ""
+		this._sharePanel.style = ''
 	}
 
 	_hideSharePanel() {
-		this._sharePanel.style = "display: none"
+		this._sharePanel.style = 'display: none'
 	}
 }

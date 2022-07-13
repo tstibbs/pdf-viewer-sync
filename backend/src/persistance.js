@@ -16,7 +16,7 @@ export async function deleteConnection(connectionId) {
 }
 
 export async function putConnection(connectionId, poolId) {
-	let nowInSeconds = Math.round( Date.now() / 1000 )
+	let nowInSeconds = Math.round(Date.now() / 1000)
 	let expirationSeconds = nowInSeconds + expirationTime
 	const params = {
 		TableName: TABLE_NAME,

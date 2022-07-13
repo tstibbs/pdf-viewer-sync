@@ -25,13 +25,15 @@ class UiAdditions {
 				components.build()
 				listenForChanges(comms)
 			} catch (e) {
-				console.error("Not enabling share feature, failed to establish websocket connectivity.")
+				console.error('Not enabling share feature, failed to establish websocket connectivity.')
 				console.error(e)
 			}
 		} else {
-			console.log("Not enabling share feature, empty endpoint url provided - set the 'endpoint' URL param to the full URL of the api gateway endpoint.")
+			console.log(
+				"Not enabling share feature, empty endpoint url provided - set the 'endpoint' URL param to the full URL of the api gateway endpoint."
+			)
 		}
 	}
 }
 
-(new UiAdditions()).init()//async but no need to wait
+new UiAdditions().init() //async but no need to wait

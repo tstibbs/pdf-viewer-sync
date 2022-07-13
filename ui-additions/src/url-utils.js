@@ -50,7 +50,7 @@ export class UrlUtils {
 
 	_updateMyUrl() {
 		const url = this._generateUrl(this._urlParams)
-		window.history.pushState({}, '', url);
+		window.history.pushState({}, '', url)
 	}
 
 	generateClientUrl() {

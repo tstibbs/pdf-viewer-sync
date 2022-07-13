@@ -11,7 +11,7 @@ import {actionSendMessage, actionPing} from '../../ui-additions/src/constants.js
 
 export function buildCommsLayer(stack) {
 	const sessionStore = new Table(stack, 'sessionStore', {
-		partitionKey: { name: TABLE_SCHEMA.pk, type: AttributeType.STRING },
+		partitionKey: {name: TABLE_SCHEMA.pk, type: AttributeType.STRING},
 		timeToLiveAttribute: TABLE_SCHEMA.ttl,
 		removalPolicy: RemovalPolicy.DESTROY
 	})
@@ -38,8 +38,8 @@ export function buildCommsLayer(stack) {
 
 	const webSocketApi = new WebSocketApi(stack, 'webSocketApi', {
 		apiName: `${Aws.STACK_NAME}-webSocketApi`,
-		connectRouteOptions: { integration: new WebSocketLambdaIntegration('ConnectIntegration', connectHandler) },
-		disconnectRouteOptions: { integration: new WebSocketLambdaIntegration('DisconnectIntegration', disconnectHandler) },
+		connectRouteOptions: {integration: new WebSocketLambdaIntegration('ConnectIntegration', connectHandler)},
+		disconnectRouteOptions: {integration: new WebSocketLambdaIntegration('DisconnectIntegration', disconnectHandler)}
 	})
 	webSocketApi.addRoute(actionSendMessage, {
 		integration: new WebSocketLambdaIntegration('SendMessageIntegration', messageHandler)

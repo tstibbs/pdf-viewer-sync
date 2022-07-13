@@ -17,26 +17,26 @@ const hostedOriginReplacer = (content, absoluteFrom) => {
 export default {
 	mode: 'development',
 	output: {
-		path: path.resolve('dist/web'),
+		path: path.resolve('dist/web')
 	},
 	plugins: [
 		new CopyWebpackPlugin({
 			patterns: [
 				{
-					context: path.resolve("public"),
-					from: "**/*",
-					to: "..",
+					context: path.resolve('public'),
+					from: '**/*',
+					to: '..',
 					globOptions: {
-						ignore: ["**/viewer.html"],
+						ignore: ['**/viewer.html']
 					},
 					transform: {
-						transformer: hostedOriginReplacer,
-					},
-				},
-			],
+						transformer: hostedOriginReplacer
+					}
+				}
+			]
 		}),
 		new HtmlWebpackPlugin({
-			template: 'public/web/viewer.html',
+			template: 'public/web/viewer.html'
 		}),
 		new MiniCssExtractPlugin()
 	],
@@ -44,8 +44,8 @@ export default {
 		rules: [
 			{
 				test: /\.css$/i,
-				use: [MiniCssExtractPlugin.loader, "css-loader"],
-			},
-		],
-	},
-};
+				use: [MiniCssExtractPlugin.loader, 'css-loader']
+			}
+		]
+	}
+}

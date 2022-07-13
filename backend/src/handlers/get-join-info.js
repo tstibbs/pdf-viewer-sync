@@ -5,7 +5,7 @@ import {apiGatewayJoinTokenParam} from '../../../ui-additions/src/constants.js'
 
 export async function handler(event) {
 	let joinToken = event.queryStringParameters?.[apiGatewayJoinTokenParam]
-	console.log({ joinToken })
+	console.log({joinToken})
 	if (joinToken == null) {
 		//new connection from first client
 		joinToken = randomUUID()

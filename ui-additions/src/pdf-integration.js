@@ -33,17 +33,19 @@ function _waitForPromise(comms) {
 		//listen for the hash being changed by another page with a target attribute, to see if we should be loading a new file
 		window.addEventListener('hashchange', event => {
 			const {newURL, oldURL} = event
-			let newFile = new URLSearchParams((new URL(newURL)).hash).get(fileParam)
-			let oldFile = new URLSearchParams((new URL(oldURL)).hash).get(fileParam)
+			let newFile = new URLSearchParams(new URL(newURL).hash).get(fileParam)
+			let oldFile = new URLSearchParams(new URL(oldURL).hash).get(fileParam)
 			if (oldFile != newFile) {
 				loadPdfFromParams()
 			}
 		})
 
 		//listed for the new pdf being loaded - this is seperate to the above to make sure that the pdf is valid/accessible first
-		PDFViewerApplication.eventBus.on('documentloaded', () => { // the doc may not be rendered on the first client yet, but doesn't hurt to get the others working on loading it regardless
+		// the doc may not be rendered on the first client yet, but doesn't hurt to get the others working on loading it regardless
+		PDFViewerApplication.eventBus.on('documentloaded', () => {
 			const file = PDFViewerApplication.url
-			if (file != 'compressed.tracemonkey-pldi-09.pdf') { //this is the default file that gets loaded on startup, so ignore
+			//this is the default file that gets loaded on startup, so ignore
+			if (file != 'compressed.tracemonkey-pldi-09.pdf') {
 				if (_isValidUrl(file)) {
 					console.log(`file changed to ${file}, telling clients to load that URL`)
 					comms.sendLoadFile(file)
@@ -71,7 +73,7 @@ function uploadFileAndShare(fileName, comms) {
 }
 
 export function changePage(pageNumber, position) {
-	PDFViewerApplication.eventBus.dispatch("pagenumberchanged", {
+	PDFViewerApplication.eventBus.dispatch('pagenumberchanged', {
 		value: pageNumber + position
 	})
 }
@@ -85,25 +87,33 @@ export function loadPdfFromParams(page = null, position = null) {
 	if (file != null && file.length > 0) {
 		//wait until the file is loaded before attempting to do anything with it
 		if (page != null) {
-			PDFViewerApplication.eventBus.on('pagesloaded', () => {
-				changePage(page, position)
-			}, {
-				once: true
-			})
+			PDFViewerApplication.eventBus.on(
+				'pagesloaded',
+				() => {
+					changePage(page, position)
+				},
+				{
+					once: true
+				}
+			)
 		}
 		if (PDFViewerApplication.pdfViewer.isInPresentationMode) {
-			PDFViewerApplication.eventBus.on('pagerendered', () => {
-				//for some reason when changing files while in presentation mode, the rendering gets screwed, this is an attempt to get it back
-				PDFViewerApplication.pdfViewer.spreadMode = 2 //pretty much any other value
-				//delay the change back to give it chance to be re-rendered
-				setTimeout(() => {
-					PDFViewerApplication.pdfViewer.scrollMode = SCROLL_MODE_PAGE
-					PDFViewerApplication.pdfViewer.spreadMode = SPREAD_MODE_NONE
-					PDFViewerApplication.pdfViewer.currentScaleValue = "page-fit"
-				}, 0)
-			}, {
-				once: true
-			})
+			PDFViewerApplication.eventBus.on(
+				'pagerendered',
+				() => {
+					//for some reason when changing files while in presentation mode, the rendering gets screwed, this is an attempt to get it back
+					PDFViewerApplication.pdfViewer.spreadMode = 2 //pretty much any other value
+					//delay the change back to give it chance to be re-rendered
+					setTimeout(() => {
+						PDFViewerApplication.pdfViewer.scrollMode = SCROLL_MODE_PAGE
+						PDFViewerApplication.pdfViewer.spreadMode = SPREAD_MODE_NONE
+						PDFViewerApplication.pdfViewer.currentScaleValue = 'page-fit'
+					}, 0)
+				},
+				{
+					once: true
+				}
+			)
 		}
 		PDFViewerApplication.open(file)
 	}

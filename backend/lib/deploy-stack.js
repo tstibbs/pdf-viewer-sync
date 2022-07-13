@@ -34,11 +34,13 @@ class DeployStack extends Stack {
 
 		this.#bucket = new Bucket(this, 'filesBucket', {
 			removalPolicy: RemovalPolicy.DESTROY,
-			cors: [{
-				allowedMethods: [HttpMethods.GET, HttpMethods.PUT],
-				allowedOrigins: allowedOrigins,
-				allowedHeaders: ['Content-Type'],
-			}],
+			cors: [
+				{
+					allowedMethods: [HttpMethods.GET, HttpMethods.PUT],
+					allowedOrigins: allowedOrigins,
+					allowedHeaders: ['Content-Type']
+				}
+			],
 			encryption: BucketEncryption.S3_MANAGED,
 			autoDeleteObjects: true,
 			lifecycleRules: [
@@ -56,17 +58,15 @@ class DeployStack extends Stack {
 		this.#httpApi = new HttpApi(this, 'httpApi', {
 			apiName: `${Aws.STACK_NAME}-httpApi`,
 			corsPreflight: {
-				allowMethods: [
-					CorsHttpMethod.GET
-				],
+				allowMethods: [CorsHttpMethod.GET],
 				allowOrigins: allowedOrigins
-			},
+			}
 		})
 		addUsageTrackingToHttpApi(this.#httpApi, 'httpApiAccessLogs')
 
 		this.buildHandler(endpointGetJoinInfo, 'get-join-info')
 		this.buildHandler(endpointGetItemUrls, 'get-item-urls')
-		new CfnOutput(this, 'apiUrl', { value: this.#httpApi.url })
+		new CfnOutput(this, 'apiUrl', {value: this.#httpApi.url})
 
 		applyStandardTags(this)
 	}
@@ -76,12 +76,14 @@ class DeployStack extends Stack {
 			WEB_SOCKET_URL: this.#webSocketUrl,
 			BUCKET: this.#bucket.bucketName
 		})
-		handler.addToRolePolicy(new PolicyStatement({
-			resources: [
-				this.#bucket.arnForObjects('*') //"arn:aws:s3:::bucketname/*"
-			],
-			actions: ['s3:GetObject', 's3:PutObject']
-		}))
+		handler.addToRolePolicy(
+			new PolicyStatement({
+				resources: [
+					this.#bucket.arnForObjects('*') //"arn:aws:s3:::bucketname/*"
+				],
+				actions: ['s3:GetObject', 's3:PutObject']
+			})
+		)
 		let integration = new HttpLambdaIntegration(`${name}-integration`, handler)
 		this.#httpApi.addRoutes({
 			path: `/${name}`,
@@ -91,4 +93,4 @@ class DeployStack extends Stack {
 	}
 }
 
-export { DeployStack }
+export {DeployStack}

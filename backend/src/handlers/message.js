@@ -1,5 +1,5 @@
-import { aws } from '../utils.js'
-import { getPoolId, getConnectionIdsInPool, deleteConnection } from '../persistance.js'
+import {aws} from '../utils.js'
+import {getPoolId, getConnectionIdsInPool, deleteConnection} from '../persistance.js'
 
 export async function handler(event) {
 	const {connectionId} = event.requestContext
@@ -17,18 +17,18 @@ export async function handler(event) {
 		connectionIds = await getConnectionIdsInPool(poolId)
 		if (!connectionIds.includes(connectionId)) {
 			console.error(`${connectionIds.join(',')} !includes ${connectionId}`)
-			throw new Error("Own connection id not included in list to send to - this indicates a problem.")
+			throw new Error('Own connection id not included in list to send to - this indicates a problem.')
 		}
 		//remove our connection id, no point telling the originator to change page when it literally just changed to this number
 		connectionIds = connectionIds.filter(id => id != connectionId)
 	} catch (e) {
 		console.error(e)
-		return { statusCode: 500, body: e.stack }
+		return {statusCode: 500, body: e.stack}
 	}
 
 	const postCalls = connectionIds.map(async connectionId => {
 		try {
-			await apigwManagementApi.postToConnection({ ConnectionId: connectionId, Data: JSON.stringify(message) }).promise()
+			await apigwManagementApi.postToConnection({ConnectionId: connectionId, Data: JSON.stringify(message)}).promise()
 		} catch (e) {
 			if (e.statusCode === 410) {
 				console.log(`Found stale connection, deleting ${connectionId}`)
@@ -43,8 +43,8 @@ export async function handler(event) {
 		await Promise.all(postCalls)
 	} catch (e) {
 		console.error(e)
-		return { statusCode: 500, body: e.stack }
+		return {statusCode: 500, body: e.stack}
 	}
 
-	return { statusCode: 200, body: 'Data sent.' }
+	return {statusCode: 200, body: 'Data sent.'}
 }

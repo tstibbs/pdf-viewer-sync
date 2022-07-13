@@ -18,16 +18,16 @@
 	top: 5%;
 	bottom: 5%;
 	display: flex;
-    align-items: center;
-    justify-content: center;
+	align-items: center;
+	justify-content: center;
 }
 
 .sync-base-panel .inner {
-    background: lightgrey;
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    flex-wrap: wrap;
+	background: lightgrey;
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+	flex-wrap: wrap;
 	padding: 10px;
 }
 
@@ -41,12 +41,19 @@
 	padding: 15px;
 }
 
-div#toolbarViewerMiddle, button#viewFind, button#print, a#viewBookmark, a#viewBookmark + div.verticalToolbarSeparator, button#download, button#secondaryToolbarToggle {
+div#toolbarViewerMiddle,
+button#viewFind,
+button#print,
+a#viewBookmark,
+a#viewBookmark + div.verticalToolbarSeparator,
+button#download,
+button#secondaryToolbarToggle {
 	/* hide all these */
 	display: none !important;
 }
 
-button#presentationMode, button#openFile {
+button#presentationMode,
+button#openFile {
 	/* override the media queries that are hiding these */
 	display: inherit !important;
 }

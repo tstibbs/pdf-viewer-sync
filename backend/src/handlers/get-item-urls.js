@@ -16,9 +16,9 @@ export async function handler(event) {
 	}
 	if (errors.length > 0) {
 		return {
-			"isBase64Encoded": false,
-			"statusCode": 400,
-			"body": errors.join('; ')
+			isBase64Encoded: false,
+			statusCode: 400,
+			body: errors.join('; ')
 		}
 	}
 	const randomizer = randomUUID() //prevents object names in the bucket being predictable, and also prevents clashes by different pdfs that are named the same
