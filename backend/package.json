@@ -3,17 +3,17 @@
 	"private": true,
 	"type": "module",
 	"dependencies": {
-		"aws-sdk": "^2.1143.0",
-		"dotenv": "^16.0.0"
+		"aws-sdk": "^2.1196.0",
+		"dotenv": "^16.0.1"
 	},
 	"devDependencies": {
-		"@aws-cdk/aws-apigatewayv2-alpha": "^2.25.0-alpha.0",
-		"@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.25.0-alpha.0",
+		"@aws-cdk/aws-apigatewayv2-alpha": "^2.38.0-alpha.0",
+		"@aws-cdk/aws-apigatewayv2-integrations-alpha": "^2.38.0-alpha.0",
 		"@tstibbs/cloud-core-utils": "file:../../cloud-core/aws/utils",
-		"aws-cdk": "^2.25.0",
-		"aws-cdk-lib": "^2.25.0",
-		"esbuild": "^0.14.43",
-		"jest": "^28.1.1"
+		"aws-cdk": "^2.38.0",
+		"aws-cdk-lib": "^2.38.0",
+		"esbuild": "^0.15.5",
+		"jest": "^28.1.3"
 	},
 	"scripts": {
 		"testsynth": "cdk-tools testsynth",
