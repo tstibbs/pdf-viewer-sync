@@ -2,6 +2,7 @@
 .cdk.staging/
 cdk.out/
 cdk.tmp/
+cdk.context.json
 
 .vscode/launch.json
 
