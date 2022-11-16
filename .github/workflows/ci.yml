@@ -1,0 +1,56 @@
+name: CI
+
+on: [push, pull_request]
+
+env:
+  npm_config_engine_strict: true
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+    # checkout a dependent project
+    - name: Checkout cloud-core
+      uses: actions/checkout@v2
+      with:
+        repository: tstibbs/cloud-core
+        path: 'cloud-core' # will resolve to /home/runner/work/pdf-viewer-sync/pdf-viewer-sync/cloud-core
+
+    # checkout 'this' project
+    - name: Checkout pdf-viewer-sync
+      uses: actions/checkout@v2
+      with:
+        path: 'pdf-viewer-sync' # will resolve to /home/runner/work/pdf-viewer-sync/pdf-viewer-sync/pdf-viewer-sync
+
+    - name: Set up node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - name: Set up environment
+      run: mkdir cdk.tmp
+      working-directory: pdf-viewer-sync/backend
+
+    - name: Load cloud-core dependencies
+      run: npm ci
+      working-directory: cloud-core/aws/utils
+
+    # root
+    - run: npm ci
+      working-directory: pdf-viewer-sync
+
+    # backend
+    - run: npm ci
+      working-directory: pdf-viewer-sync/backend
+    - run: npm run testsynth
+      working-directory: pdf-viewer-sync/backend
+    - run: npm run test
+      working-directory: pdf-viewer-sync/backend
+
+    # frontend
+    - run: npm ci
+      working-directory: pdf-viewer-sync/ui-additions
+    - run: npm run build
+      working-directory: pdf-viewer-sync/ui-additions
