@@ -26,6 +26,7 @@
 	"scripts": {
 		"_pre": "rm -rf dist",
 		"build": "npm run _pre && webpack",
-		"dev": "npm run _pre && webpack serve"
+		"dev": "npm run _pre && webpack serve",
+		"download-deps": "curl -L https://github.com/mozilla/pdf.js/releases/download/v2.13.216/pdfjs-2.13.216-dist.zip -o dist.zip && rm -rf public/* && unzip -d public dist.zip && rm dist.zip"
 	}
 }

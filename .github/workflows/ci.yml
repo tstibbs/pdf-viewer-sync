@@ -50,6 +50,8 @@ jobs:
       working-directory: pdf-viewer-sync/backend
 
     # frontend
+    - run: npm run download-deps
+      working-directory: pdf-viewer-sync/ui-additions
     - run: npm ci
       working-directory: pdf-viewer-sync/ui-additions
     - run: npm run build
