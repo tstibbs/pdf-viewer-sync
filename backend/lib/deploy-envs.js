@@ -7,3 +7,13 @@ if (STACK_NAME == null || STACK_NAME.length == 0) {
 	STACK_NAME = 'NO-STACK-NAME-PROVIDED' //makes testing slightly easier by not always insisting something is set
 }
 export {STACK_NAME}
+
+export const COUNTRIES_DENY_LIST = splitOrEmpty('COUNTRIES_DENY_LIST')
+
+function splitOrEmpty(envName) {
+	if (envName in process.env) {
+		return envName.split(',') //if empty string, will result in empty array, which is probably what we want
+	} else {
+		return null //because if the env isn't set, we want it to break in order to flag that it isn't set, so the operator can go and set it
+	}
+}

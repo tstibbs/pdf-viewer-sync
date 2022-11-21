@@ -11,4 +11,4 @@ aws.config.apiVersions = {
 
 export {aws}
 
-export const {TABLE_NAME, WEB_SOCKET_URL, BUCKET} = process.env
+export const {TABLE_NAME, BUCKET} = process.env

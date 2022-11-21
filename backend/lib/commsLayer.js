@@ -3,11 +3,9 @@ import {Table, AttributeType} from 'aws-cdk-lib/aws-dynamodb'
 import {WebSocketApi, WebSocketStage} from '@aws-cdk/aws-apigatewayv2-alpha'
 import {WebSocketLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alpha'
 
-import {addUsageTrackingToWebsocketStage} from '@tstibbs/cloud-core-utils/src/stacks/usage-tracking.js'
-
 import {buildGenericHandler} from './deploy-utils.js'
 import {TABLE_SCHEMA} from '../src/constants.js'
-import {actionSendMessage, actionPing} from '../../ui-additions/src/constants.js'
+import {commsUrlPrefix, actionSendMessage, actionPing} from '../../ui-additions/src/constants.js'
 
 export function buildCommsLayer(stack) {
 	const sessionStore = new Table(stack, 'sessionStore', {
@@ -52,10 +50,9 @@ export function buildCommsLayer(stack) {
 
 	const webSocketStage = new WebSocketStage(stack, 'webSocketStage', {
 		webSocketApi,
-		stageName: 'prod',
+		stageName: commsUrlPrefix,
 		autoDeploy: true
 	})
-	addUsageTrackingToWebsocketStage(webSocketStage)
 
-	return `${webSocketApi.apiEndpoint}/${webSocketStage.stageName}`
+	return webSocketStage
 }

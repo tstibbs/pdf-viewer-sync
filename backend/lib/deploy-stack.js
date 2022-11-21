@@ -4,13 +4,21 @@ import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alph
 import {HttpApi, HttpMethod, CorsHttpMethod} from '@aws-cdk/aws-apigatewayv2-alpha'
 import {Bucket, HttpMethods, BucketEncryption} from 'aws-cdk-lib/aws-s3'
 import {PolicyStatement} from 'aws-cdk-lib/aws-iam'
+import {HttpOrigin} from 'aws-cdk-lib/aws-cloudfront-origins'
 
 import {applyStandardTags} from '@tstibbs/cloud-core-utils'
-import {addUsageTrackingToHttpApi} from '@tstibbs/cloud-core-utils/src/stacks/usage-tracking.js'
+import {CloudFrontResources} from '@tstibbs/cloud-core-utils/src/stacks/cloudfront.js'
 
 import {buildCommsLayer} from './commsLayer.js'
 import {buildGenericHandler} from './deploy-utils.js'
-import {endpointGetJoinInfo, endpointGetItemUrls} from '../../ui-additions/src/constants.js'
+import {
+	endpointGetJoinInfo,
+	endpointGetItemUrls,
+	requestsUrlPrefix,
+	commsUrlPrefix
+} from '../../ui-additions/src/constants.js'
+
+import {COUNTRIES_DENY_LIST} from './deploy-envs.js'
 
 const allowedOrigins = [
 	'https://tstibbs.github.io', //where the UI actually gets deployed
@@ -18,7 +26,6 @@ const allowedOrigins = [
 ]
 
 class DeployStack extends Stack {
-	#webSocketUrl
 	#bucket
 	#httpApi
 
@@ -30,7 +37,7 @@ class DeployStack extends Stack {
 			cloudWatchRoleArn: Fn.importValue('AllAccountsStack-apiGatewayCloudWatchRoleArn')
 		})
 
-		this.#webSocketUrl = buildCommsLayer(this)
+		const webSocketStage = buildCommsLayer(this)
 
 		this.#bucket = new Bucket(this, 'filesBucket', {
 			removalPolicy: RemovalPolicy.DESTROY,
@@ -62,18 +69,23 @@ class DeployStack extends Stack {
 				allowOrigins: allowedOrigins
 			}
 		})
-		addUsageTrackingToHttpApi(this.#httpApi, 'httpApiAccessLogs')
 
-		this.buildHandler(endpointGetJoinInfo, 'get-join-info')
-		this.buildHandler(endpointGetItemUrls, 'get-item-urls')
-		new CfnOutput(this, 'apiUrl', {value: this.#httpApi.url})
+		const cloudfrontDefaultBehavior = {
+			//let's keep our various APIs seperate under their own subpaths, thus let's make the default path completely invalid.
+			origin: new HttpOrigin('default.not.in.use.invalid')
+		}
+		const cloudFrontResources = new CloudFrontResources(this, COUNTRIES_DENY_LIST, cloudfrontDefaultBehavior)
+		cloudFrontResources.addHttpApi(`${requestsUrlPrefix}/*`, this.#httpApi)
+		cloudFrontResources.addWebSocketApi(commsUrlPrefix, webSocketStage)
+
+		this.#buildHandler(endpointGetJoinInfo, 'get-join-info')
+		this.#buildHandler(endpointGetItemUrls, 'get-item-urls')
 
 		applyStandardTags(this)
 	}
 
-	buildHandler(name, entry) {
+	#buildHandler(name, entry) {
 		let handler = buildGenericHandler(this, `${name}-handler`, entry, {
-			WEB_SOCKET_URL: this.#webSocketUrl,
 			BUCKET: this.#bucket.bucketName
 		})
 		handler.addToRolePolicy(
@@ -86,7 +98,7 @@ class DeployStack extends Stack {
 		)
 		let integration = new HttpLambdaIntegration(`${name}-integration`, handler)
 		this.#httpApi.addRoutes({
-			path: `/${name}`,
+			path: `/${requestsUrlPrefix}/${name}`,
 			methods: [HttpMethod.GET],
 			integration: integration
 		})

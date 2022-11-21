@@ -1,5 +1,6 @@
 import axios from 'axios'
 import {
+	requestsUrlPrefix,
 	endpointGetJoinInfo,
 	endpointGetItemUrls,
 	endpointFileNameParam,
@@ -14,7 +15,7 @@ export class ApiInterface {
 	constructor(poolId, endpoint) {
 		this.#poolId = poolId
 		this.#axios = axios.create({
-			baseURL: endpoint
+			baseURL: `${endpoint}/${requestsUrlPrefix}`
 		})
 	}
 

@@ -1,3 +1,5 @@
+export const requestsUrlPrefix = 'requests'
+export const commsUrlPrefix = 'comms'
 export const apiGatewayJoinTokenParam = 'joinToken'
 export const joinTokenParam = 'joinToken'
 export const endpointParam = 'endpoint'

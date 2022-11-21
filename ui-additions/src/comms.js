@@ -2,6 +2,7 @@ import UAParser from 'ua-parser-js'
 
 import {Notifier} from './notifier.js'
 import {
+	commsUrlPrefix,
 	apiGatewayJoinTokenParam,
 	messageTypeChangePage,
 	actionSendMessage,
@@ -15,6 +16,7 @@ import {ApiInterface} from './api-interface.js'
 export class Comms {
 	#stayAwaker
 	#apiInterface
+	#endpoint
 
 	constructor(stayAwaker, urlUtils) {
 		this.#stayAwaker = stayAwaker
@@ -26,14 +28,15 @@ export class Comms {
 		// initialise such that we don't publish a 'file change' event when we load the file
 		this._lastRecievedFileLoad = this._urlUtils.getFile()
 		this._joinToken = this._urlUtils.getJoinToken()
-		const endpoint = this._urlUtils.getEndpoint()
-		this.#apiInterface = new ApiInterface(this._joinToken, endpoint)
+		this.#endpoint = this._urlUtils.getEndpoint()
+		this.#apiInterface = new ApiInterface(this._joinToken, this.#endpoint)
 	}
 
 	async init() {
 		let joinInfo = await this.#apiInterface.fetchJoinInfo()
 		this._joinToken = joinInfo.poolId
-		const websocketUrl = `${joinInfo.webSocketUrl}?${apiGatewayJoinTokenParam}=${this._joinToken}`
+		const webSocketBase = this.#endpoint.startsWith('http') ? 'ws' + this.#endpoint.substring(4) : this.#endpoint
+		const websocketUrl = `${webSocketBase}/${commsUrlPrefix}?${apiGatewayJoinTokenParam}=${this._joinToken}`
 		this._urlUtils.updateJoinToken(this._joinToken)
 		this._socket = new ResilientWebSocket(websocketUrl, this._handleMessage.bind(this), this.#stayAwaker)
 		await this.waitForSocketReady()
