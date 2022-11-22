@@ -44,15 +44,15 @@
 div#toolbarViewerMiddle,
 button#viewFind,
 button#print,
-a#viewBookmark,
-a#viewBookmark + div.verticalToolbarSeparator,
 button#download,
+button#download + div.verticalToolbarSeparator,
+#editorModeButtons,
+#editorModeButtons + #editorModeSeparator,
 button#secondaryToolbarToggle {
 	/* hide all these */
 	display: none !important;
 }
 
-button#presentationMode,
 button#openFile {
 	/* override the media queries that are hiding these */
 	display: inherit !important;

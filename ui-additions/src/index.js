@@ -5,6 +5,12 @@ import {Comms} from './comms.js'
 import {Sharer} from './sharer.js'
 import {UrlUtils} from './url-utils.js'
 
+//show the presentation mode button as a normal button, not hidden in the secondary menu
+const presentationMode = document.getElementById('presentationMode')
+presentationMode.classList.remove('secondaryToolbarButton')
+presentationMode.classList.add('toolbarButton')
+document.getElementById('openFile').before(presentationMode)
+
 class UiAdditions {
 	#endpoint
 
