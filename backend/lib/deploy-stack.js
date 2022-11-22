@@ -84,6 +84,8 @@ class DeployStack extends Stack {
 		this.#buildHandler(endpointGetJoinInfo, 'get-join-info')
 		this.#buildHandler(endpointGetItemUrls, 'get-item-urls')
 
+		new CfnOutput(this, 'endpointUrl', {value: `https://${cloudFrontResources.distribution.distributionDomainName}`})
+
 		applyStandardTags(this)
 	}
 
