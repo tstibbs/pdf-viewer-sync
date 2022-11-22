@@ -3,17 +3,21 @@ export class StayAwake {
 		let wakeLock = null
 
 		const requestWakeLock = async () => {
-			try {
-				wakeLock = await navigator.wakeLock.request('screen')
-				this._awake = true
+			if (navigator.wakeLock != undefined) {
+				try {
+					wakeLock = await navigator.wakeLock.request('screen')
+					this._awake = true
 
-				//listen for us losing the lock (for example user navigates to another tab)
-				wakeLock.addEventListener('release', () => {
+					//listen for us losing the lock (for example user navigates to another tab)
+					wakeLock.addEventListener('release', () => {
+						this._awake = false
+					})
+				} catch (err) {
+					console.error(`${err.name}, ${err.message}`)
 					this._awake = false
-				})
-			} catch (err) {
-				console.error(`${err.name}, ${err.message}`)
-				this._awake = false
+				}
+			} else {
+				console.warn(`Cannot request wakelock, navigator.wakeLock=${navigator.wakeLock}.`)
 			}
 		}
 
