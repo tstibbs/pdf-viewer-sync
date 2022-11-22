@@ -32,6 +32,9 @@ jobs:
     - name: Set up environment
       run: mkdir cdk.tmp
       working-directory: pdf-viewer-sync/backend
+    - name: Set up test environment
+      run: cp dummy.env .env
+      working-directory: pdf-viewer-sync/backend
 
     - name: Load cloud-core dependencies
       run: npm ci

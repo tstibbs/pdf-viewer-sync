@@ -1,3 +1,5 @@
+import assert from 'assert'
+
 import {Aws, Stack, RemovalPolicy, CfnOutput, Duration, Fn} from 'aws-cdk-lib'
 import {CfnAccount} from 'aws-cdk-lib/aws-apigateway'
 import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alpha'
@@ -19,6 +21,7 @@ import {
 } from '../../ui-additions/src/constants.js'
 
 import {COUNTRIES_DENY_LIST} from './deploy-envs.js'
+assert(COUNTRIES_DENY_LIST != null && COUNTRIES_DENY_LIST.length > 0)
 
 const allowedOrigins = [
 	'https://tstibbs.github.io', //where the UI actually gets deployed
