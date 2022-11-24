@@ -56,11 +56,22 @@ function _waitForPromise(comms) {
 			}
 		})
 
+		let timeoutCalls = []
+
 		//now register a listener for when the page changes
 		PDFViewerApplication.eventBus.on('pagechanging', event => {
-			const {pageNumber} = event
-			console.log(`page changed to ${pageNumber}`)
-			comms.sendPageChange(pageNumber)
+			//if we've hit another event and there are timeouts still to run, then we must have triggered within 10 ms of the last one, so cancel the last ones and set up a new one. This might in turn get cancelled...
+			if (timeoutCalls.length > 0) {
+				timeoutCalls.forEach(timeoutId => clearTimeout(timeoutId)) //may have already fired, but that's ok, attempt to clear it and then forget it anyway
+				timeoutCalls = []
+			}
+			let timeoutId = setTimeout(() => {
+				//ignore any events that occur within
+				const {pageNumber} = event
+				console.log(`page changed to ${pageNumber}`)
+				comms.sendPageChange(pageNumber)
+			}, 10)
+			timeoutCalls.push(timeoutId)
 		})
 	})
 }
