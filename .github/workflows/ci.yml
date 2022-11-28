@@ -36,9 +36,12 @@ jobs:
       run: cp dummy.env .env
       working-directory: pdf-viewer-sync/backend
 
-    - name: Load cloud-core dependencies
+    - name: Load cloud-core utils dependencies
       run: npm ci
       working-directory: cloud-core/aws/utils
+    - name: Load cloud-core ui dependencies
+      run: npm ci
+      working-directory: cloud-core/ui
 
     # root
     - run: npm ci
