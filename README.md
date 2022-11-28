@@ -1,6 +1,6 @@
 # pdf-viewer-sync
 
-This project is an attempt to provide a pdf viewer for mobile devices that syncs page changes across multiple devices. This could be used for many different things, but the main use-case we focus on is the situation where you are attempting to play pdf sheet music. It is generally desirable to be able to see multiple pages of music at the same time, as it is often not convenient to turn the page at the point in the music that just happens to be at the bottom of each page. Using this project, you are able to bring up a pdf viewer on multiple devices, showing the same pdf, and when you change page on one device the other devices will also change page. The tool also allows you to open a pdf on one device and have it sync across (via cloud storage) to another device.
+This project is an attempt to provide a pdf viewer for mobile devices that syncs page changes across multiple devices. This could be used for many different things, but the main use-case that inspired this project is the situation where you are attempting to play pdf sheet music. It is generally desirable to be able to see multiple pages of music at the same time, as it is often not convenient to turn the page at the point in the music that just happens to be at the bottom of each page. Using this project, you are able to bring up a pdf viewer on multiple devices, showing the same pdf, and when you change page on one device the other devices will also change page. The tool also allows you to open a pdf on one device and have it sync across (via cloud storage) to another device.
 
 # How to use
 
@@ -10,8 +10,9 @@ Deploying the backend requires an AWS account which has been bootstrapped using 
 
 In the `backend` directory:
 
-1. Create a .env file using `dummy.env` as a template.
+1. Create a `.env` file using `dummy.env` as a template.
 1. Fill out the values as appropriate.
+1. Run `npm ci`
 1. Run `npx cdk deploy` (having configured authentication as appropriate for your environment).
 1. Note the value of the `endpointUrl` output printed after the deploy completes successfully.
 
@@ -24,9 +25,11 @@ Note in the following instructions `<endpointUrl>` should be replaced by a URL-e
 1. Open the UI: [https://tstibbs.github.io/pdf-viewer-sync/web/#endpoint=\<endpointUrl\>](https://tstibbs.github.io/pdf-viewer-sync/web/#endpoint=<endpointUrl>).
 1. Click the Share button on the top right.
 1. From a second device, scan the QR code now displayed on the first device.
-1. Choose the position value. For example, choosing position 1 would cause this device to always show one page further on than the first device. Negative numbers will cause it to show pages offset to a page number lower than the first device.
+1. Choose the position value. For example, choosing position 1 would cause this device to always show one page further on than the first device. Negative numbers will cause it to show pages at lower number than the first device. Choosing position 0 will cause the second device to show the exact same page as the first device.
 1. On either device, click the Open File button on the top right. After opening the PDF on one device is should soon appear automatically on the other device(s). The PDF is uploaded to S3 so this can take a while for very large PDFs.
 1. Swipe, click, scroll etc to change page on any device. Other devices will change to the same page, plus or minus their position value.
+
+It should be possible to load multiple devices by scanning the QR code generated on any other device (it does not always have to be the first device that generates the QR code). The backend should scale to be able to handle far more devices that would be practical.
 
 ### Other ways to load the UI
 
