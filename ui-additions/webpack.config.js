@@ -1,3 +1,4 @@
+import {fileURLToPath} from 'url'
 import {resolve} from 'path'
 import {readFile} from 'fs/promises'
 
@@ -25,21 +26,27 @@ async function renderTemplate() {
 	let contents = (await readFile('public/web/viewer.html')).toString()
 	let headAdditions = `
 	<style>
-		<%- include('../templates/error-display.css.ejs') %>
+		<%- include('./node_modules/@tstibbs/cloud-core-ui/templates/error-display.css.ejs') %>
 	</style>
 	<script type="text/javascript">
-		<%- include('../templates/feature-detect.js.ejs') %>
+		<%- include('./node_modules/@tstibbs/cloud-core-ui/templates/feature-detect.js.ejs') %>
 	</script>
 	<script type="text/javascript">
-		<%- include('../templates/error-handler.js.ejs') %>
+		<%- include('./node_modules/@tstibbs/cloud-core-ui/templates/error-handler.js.ejs') %>
 	</script>`
 	contents = contents.replace(/(<head[^>]*>)/, `$1\n${headAdditions}`)
-	let bodyAdditions = `<%- include('../templates/error-display.html.ejs') %>`
+	let bodyAdditions = `<%- include('./node_modules/@tstibbs/cloud-core-ui/templates/error-display.html.ejs') %>`
 	contents = contents.replace(/(<body[^>]*>)/, `$1\n${bodyAdditions}`)
-	return renderTemplateContents(contents, {
-		projectName,
-		bugReportUrl
-	})
+	return renderTemplateContents(
+		contents,
+		{
+			projectName,
+			bugReportUrl,
+			writeFeatureErrorsToDom: true,
+			logsEntriesIndicateErrors: false // i.e. don't show the error handler by default because there are likely to be non-error logs
+		},
+		fileURLToPath(import.meta.url)
+	)
 }
 
 export default {
