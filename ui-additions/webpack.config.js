@@ -5,11 +5,27 @@ import {readFile} from 'fs/promises'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
+import {LicenseWebpackPlugin} from 'license-webpack-plugin'
 
 import {renderTemplateContents} from '@tstibbs/cloud-core-ui/build/templates.js'
+import {defaultLicenseWebpackPluginConfig} from '@tstibbs/cloud-core-ui/build/licence-generation.js'
 
 const projectName = `pdf-viewer-sync`
 const bugReportUrl = `https://github.com/tstibbs/${projectName}/issues/new`
+
+const mitLicenceText = await readFile('./build/third-party-licences/MIT-License.txt')
+const licenseTextOverrides = {
+	'encode-utf8': mitLicenceText,
+	toastr: mitLicenceText
+}
+
+const additionalModulesToLicence = [
+	{
+		//we install this module just for the licencing info - it doesn't contain all the files we need so we get them via build/download-deps.js
+		name: 'pdfjs-dist',
+		directory: './node_modules/pdfjs-dist'
+	}
+]
 
 //the viewer doesn't by default allow cross-origin pdf loads - this change undoes that restriction
 const hostedOriginReplacer = (content, absoluteFrom) => {
@@ -73,7 +89,12 @@ export default {
 		new HtmlWebpackPlugin({
 			templateContent: await renderTemplate()
 		}),
-		new MiniCssExtractPlugin()
+		new MiniCssExtractPlugin(),
+		new LicenseWebpackPlugin({
+			...defaultLicenseWebpackPluginConfig,
+			licenseTextOverrides: licenseTextOverrides, //not so much overrides - just using this to specify licences that are missing in the node module itself
+			additionalModules: additionalModulesToLicence
+		})
 	],
 	module: {
 		rules: [
