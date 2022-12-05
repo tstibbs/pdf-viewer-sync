@@ -62,3 +62,11 @@ button#openFile {
 	-webkit-mask-image: url(share-line.svg);
 	mask-image: url(share-line.svg);
 }
+
+.toolbarButton.shareAndSync.connected::before {
+	background-color: #00cd00; /*bright green*/
+}
+
+.toolbarButton.shareAndSync.disconnected::before {
+	background-color: #eb0000; /*slightly dark red*/
+}

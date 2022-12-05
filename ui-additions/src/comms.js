@@ -7,7 +7,8 @@ import {
 	messageTypeChangePage,
 	actionSendMessage,
 	messageTypeLoadFile,
-	messageTypeClientJoined
+	messageTypeClientJoined,
+	messageTypeCounterUpdate
 } from './constants.js'
 import {changePage, loadPdfFromParams, getCurrentPage} from './pdf-integration.js'
 import {ResilientWebSocket} from './websocket.js'
@@ -17,8 +18,11 @@ export class Comms {
 	#stayAwaker
 	#apiInterface
 	#endpoint
+	#clientsCounter // counts the number of clients in the pool, including this one
+	#connectionStateChangeListener
 
 	constructor(stayAwaker, urlUtils) {
+		this.#clientsCounter = 0
 		this.#stayAwaker = stayAwaker
 		this._uaParser = new UAParser()
 		this._notifier = new Notifier()
@@ -38,7 +42,12 @@ export class Comms {
 		const webSocketBase = this.#endpoint.startsWith('http') ? 'ws' + this.#endpoint.substring(4) : this.#endpoint
 		const websocketUrl = `${webSocketBase}/${commsUrlPrefix}?${apiGatewayJoinTokenParam}=${this._joinToken}`
 		this._urlUtils.updateJoinToken(this._joinToken)
-		this._socket = new ResilientWebSocket(websocketUrl, this._handleMessage.bind(this), this.#stayAwaker)
+		this._socket = new ResilientWebSocket(
+			websocketUrl,
+			this._handleMessage.bind(this),
+			this.#stayAwaker,
+			this.#connectionStateChangeListener
+		)
 		await this.waitForSocketReady()
 	}
 
@@ -91,6 +100,9 @@ export class Comms {
 			case messageTypeClientJoined:
 				this._recievedClientJoined(data.value)
 				break
+			case messageTypeCounterUpdate:
+				this._recievedCounterUpdate(data.value)
+				break
 			default:
 				console.error('Unexpected data type: ' + data.type)
 		}
@@ -118,8 +130,17 @@ export class Comms {
 		this._onClientJoinedListener()
 	}
 
+	_recievedCounterUpdate(count) {
+		this.#clientsCounter = count
+		this.#connectionStateChangeListener()
+	}
+
 	onClientJoined(listener) {
 		this._onClientJoinedListener = listener
+	}
+
+	onConnectionStateChange(listener) {
+		this.#connectionStateChangeListener = listener
 	}
 
 	async waitForSocketReady() {
@@ -170,5 +191,12 @@ export class Comms {
 		await this.waitForSocketReady()
 		let shareUrl = await this.#apiInterface.uploadFile(fileName, data)
 		await this.sendLoadFile(shareUrl)
+	}
+
+	get connectionInfo() {
+		return {
+			clientsCounter: this.#clientsCounter,
+			connected: this._socket.isConnected()
+		}
 	}
 }

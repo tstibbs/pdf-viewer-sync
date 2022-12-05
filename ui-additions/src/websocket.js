@@ -4,10 +4,15 @@ const THREE_HOURS_IN_MILLIS = 3 * 60 * 60 * 1000
 const FIVE_MINS_IN_MILLIS = 5 * 60 * 1000
 
 export class ResilientWebSocket {
-	constructor(url, messageHandler, stayAwaker) {
+	#connectionStateChangeListener
+	#socketOpen
+
+	constructor(url, messageHandler, stayAwaker, connectionStateChangeListener) {
 		this._url = url
 		this._messageHandler = messageHandler
 		this._stayAwaker = stayAwaker
+		this.#connectionStateChangeListener = connectionStateChangeListener
+		this.#socketOpen = false
 		this._createSocket()
 	}
 
@@ -23,17 +28,12 @@ export class ResilientWebSocket {
 				console.log('socket close')
 				console.log(event)
 				reject(event) //this won't do anything if the promise is already resolved
-				this._closeSocket()
-				if (this._shouldReconnect()) {
-					console.log('socket closed; attempting reconnect')
-					this._createSocket() //create a new WebSocket connection, old one is dead
-				} else {
-					console.log('socket closed; not attempting reconnect')
-				}
+				this.#closeSocket()
 			}
 
 			this._socket.onopen = () => {
 				console.log('socket open')
+				this.#connected()
 				resolve() //socket set up and ready to use
 			}
 
@@ -45,7 +45,13 @@ export class ResilientWebSocket {
 		})
 	}
 
-	_closeSocket() {
+	#connected() {
+		this.#socketOpen = true
+		this.#connectionStateChangeListener()
+	}
+
+	#closeSocket() {
+		this.#socketOpen = false
 		if (this._socket != null) {
 			this._socket.close()
 			this._socket.onopen = null
@@ -54,6 +60,17 @@ export class ResilientWebSocket {
 			this._socket.onerror = null
 			this._socket = null
 		}
+		this.#connectionStateChangeListener() //may be triggered again as a result of creating a new socket
+		if (this._shouldReconnect()) {
+			console.log('socket closed; attempting reconnect')
+			this._createSocket() //create a new WebSocket connection, old one is dead
+		} else {
+			console.log('socket closed; not attempting reconnect')
+		}
+	}
+
+	isConnected() {
+		return this._socket != null && this.#socketOpen
 	}
 
 	_shouldReconnect() {
@@ -74,16 +91,24 @@ export class ResilientWebSocket {
 
 	_ping() {
 		//send directly, don't record this as 'last activity'
-		this._socket.send(
-			JSON.stringify({
-				action: actionPing
-			})
-		)
+		this.#socketSend({
+			action: actionPing
+		})
 	}
 
 	send(message) {
 		this._lastMessageActivity = Date.now()
-		this._socket.send(JSON.stringify(message))
+		this.#socketSend(message)
+	}
+
+	#socketSend(message) {
+		try {
+			this._socket.send(JSON.stringify(message))
+		} catch (e) {
+			console.error(e)
+			this.#closeSocket() //something is broken, close it (which will trigger a re-open) to see if that helps
+			throw e
+		}
 	}
 
 	_handleMessage(event) {

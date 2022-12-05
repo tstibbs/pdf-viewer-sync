@@ -2,14 +2,26 @@ import './additions.css'
 import {changePage} from './pdf-integration.js'
 
 export class Components {
+	#sharePanelShown
+
 	constructor(urlUtils, sharer, comms) {
 		this._urlUtils = urlUtils
 		this._sharer = sharer
 		this._comms = comms
+		this.#sharePanelShown = false
+		this._comms.onConnectionStateChange(() => {
+			this.#connectionStateChanged()
+		})
+		//don't display yet, but create so it can be re-configured by the connection listener
+		this._openSharePanelButton = document.createElement('button')
+		this._openSharePanelButton.innerHTML = `<span>Share and Sync</span>`
+		this._openSharePanelButton.title = 'Share and Sync'
+		this._openSharePanelButton.classList.add('toolbarButton')
+		this._openSharePanelButton.classList.add('shareAndSync')
 	}
 
 	build() {
-		if (this._urlUtils.getPosition() == null) {
+		if (this._urlUtils.isJoiningExistingPool()) {
 			this._addJoinPanel()
 		}
 		this._addSharePanel()
@@ -72,13 +84,8 @@ export class Components {
 
 	_addShareButton() {
 		//add button to open share panel
-		this._openButton = document.createElement('button')
-		this._openButton.innerHTML = `<span>Share and Sync</span>`
-		this._openButton.title = 'Share and Sync'
-		this._openButton.classList.add('toolbarButton')
-		this._openButton.classList.add('shareAndSync')
 		let presentationButton = document.getElementById('presentationMode')
-		presentationButton.parentElement.insertBefore(this._openButton, presentationButton)
+		presentationButton.parentElement.insertBefore(this._openSharePanelButton, presentationButton)
 	}
 
 	_listenForClicks() {
@@ -91,7 +98,7 @@ export class Components {
 		this._shareCloseButton.addEventListener('click', () => {
 			this._hideSharePanel()
 		})
-		this._openButton.addEventListener('click', () => {
+		this._openSharePanelButton.addEventListener('click', () => {
 			this._showSharePanel()
 		})
 	}
@@ -101,6 +108,8 @@ export class Components {
 	}
 
 	async _showSharePanel() {
+		this.#sharePanelShown = true
+		this.#connectionStateChanged() //trigger UI update as if we've "just connected"
 		let shareUrl = await this._sharer.showShareInfo(this._canvas)
 		this._link.href = shareUrl
 		this._link.text = shareUrl
@@ -109,5 +118,21 @@ export class Components {
 
 	_hideSharePanel() {
 		this._sharePanel.style = 'display: none'
+	}
+
+	#connectionStateChanged() {
+		const {connected, clientsCounter} = this._comms.connectionInfo
+		console.log({connected})
+		console.log({clientsCounter})
+		if (this.#sharePanelShown || this._urlUtils.isJoiningExistingPool()) {
+			//don't show connection info until we've attempted to share, or if we're joining a pool
+			if (connected) {
+				this._openSharePanelButton.classList.add('connected')
+				this._openSharePanelButton.classList.remove('disconnected')
+			} else {
+				this._openSharePanelButton.classList.add('disconnected')
+				this._openSharePanelButton.classList.remove('connected')
+			}
+		}
 	}
 }

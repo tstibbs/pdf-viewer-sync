@@ -47,6 +47,8 @@ export function buildCommsLayer(stack) {
 		integration: new WebSocketLambdaIntegration('pingIntegration', pingHandler)
 	})
 	webSocketApi.grantManageConnections(messageHandler)
+	webSocketApi.grantManageConnections(connectHandler)
+	webSocketApi.grantManageConnections(disconnectHandler)
 
 	const webSocketStage = new WebSocketStage(stack, 'webSocketStage', {
 		webSocketApi,

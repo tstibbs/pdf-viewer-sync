@@ -2,6 +2,8 @@ import {joinTokenParam, endpointParam, positionParam, pageParam, fileParam} from
 import {getCurrentPage} from './pdf-integration.js'
 
 export class UrlUtils {
+	#joiningExistingPool
+
 	constructor() {
 		this._urlParams = this._parseHash(location.hash)
 		this._joinToken = this._urlParams.get(joinTokenParam)
@@ -16,7 +18,12 @@ export class UrlUtils {
 		if (this._startingPage != null) {
 			this._startingPage = parseInt(this._startingPage)
 		}
-		if (this._position == null && this._joinToken == null) {
+		if (this._joinToken != null) {
+			this.#joiningExistingPool = true
+		} else {
+			this.#joiningExistingPool = false
+		}
+		if (this._position == null && !this.#joiningExistingPool) {
 			//we are the first UI, so assume position 0 and initialise it as such to prevent "join pool?" popups
 			this.updatePosition(0)
 		}
@@ -74,6 +81,10 @@ export class UrlUtils {
 
 	getPosition() {
 		return this._position
+	}
+
+	isJoiningExistingPool() {
+		return this.#joiningExistingPool
 	}
 
 	getStartingPage() {
