@@ -1,5 +1,13 @@
 import './additions.css'
 import {changePage} from './pdf-integration.js'
+import icon0 from './img/share-icon-0.svg'
+import icon1 from './img/share-icon-1.svg'
+import icon2 from './img/share-icon-2.svg'
+import icon3 from './img/share-icon-3.svg'
+import icon4 from './img/share-icon-4.svg'
+import icon5 from './img/share-icon-5.svg'
+import icon6 from './img/share-icon-6.svg'
+const icons = [icon0, icon1, icon2, icon3, icon4, icon5, icon6]
 
 export class Components {
 	#sharePanelShown
@@ -18,6 +26,7 @@ export class Components {
 		this._openSharePanelButton.title = 'Share and Sync'
 		this._openSharePanelButton.classList.add('toolbarButton')
 		this._openSharePanelButton.classList.add('shareAndSync')
+		this.#setShareIcon(0) //default to zero clients connected, just so there's something to show
 	}
 
 	build() {
@@ -124,8 +133,9 @@ export class Components {
 		const {connected, clientsCounter} = this._comms.connectionInfo
 		console.log({connected})
 		console.log({clientsCounter})
+		//don't show connection info until we've attempted to share, or if we're joining a pool
 		if (this.#sharePanelShown || this._urlUtils.isJoiningExistingPool()) {
-			//don't show connection info until we've attempted to share, or if we're joining a pool
+			//update colour of icon first
 			if (connected) {
 				this._openSharePanelButton.classList.add('connected')
 				this._openSharePanelButton.classList.remove('disconnected')
@@ -133,6 +143,16 @@ export class Components {
 				this._openSharePanelButton.classList.add('disconnected')
 				this._openSharePanelButton.classList.remove('connected')
 			}
+			//now update the dots to indicate how many clients are connected
+			this.#setShareIcon(clientsCounter)
 		}
+	}
+
+	#setShareIcon(clientsCounter) {
+		//we don't have icons for large client numbers, so cap at the max we do have
+		if (clientsCounter > icons.length - 1) {
+			clientsCounter = icons.length - 1
+		}
+		this._openSharePanelButton.style.setProperty('--share-icon-url', `url(${icons[clientsCounter]})`)
 	}
 }
