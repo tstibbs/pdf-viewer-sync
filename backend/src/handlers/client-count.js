@@ -3,7 +3,7 @@ import {getPoolId, getConnectionIdsInPool} from '../persistance.js'
 import {messageTypeCounterUpdate} from '../../../ui-additions/src/constants.js'
 
 //now update other clients to update their counter
-export async function updateClientsCounter(event, disconnect) {
+export async function updateClientsCounter(event, disconnect, sendToSender = false) {
 	const {connectionId} = event.requestContext
 	let poolId = await getPoolId(connectionId)
 	let connectionIds = await getConnectionIdsInPool(poolId)
@@ -15,5 +15,5 @@ export async function updateClientsCounter(event, disconnect) {
 		type: messageTypeCounterUpdate,
 		value: count
 	}
-	await sendMessage(event, message)
+	await sendMessage(event, message, sendToSender)
 }
