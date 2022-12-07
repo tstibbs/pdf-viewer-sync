@@ -1,25 +1,25 @@
-import {deleteConnection} from '../persistance.js'
-import {updateClientsCounter} from './client-count.js'
+import {getPoolId, deleteConnection} from '../persistance.js'
+import {buildClientsCounterMessageFromPoolId} from './client-count.js'
+import {sendMessageToPoolId} from './message.js'
+import {messageTypeClientLeft} from '../../../ui-additions/src/constants.js'
 
 export async function handler(event) {
-	updateCounterError = null
+	const {connectionId} = event.requestContext
 	try {
-		//first update other clients about the disconnection (because we need the info still in dydb to do the update)
-		try {
-			await updateClientsCounter(event, true)
-		} catch (err) {
-			console.error(err)
-			updateCounterError = {statusCode: 500, body: 'Failed to update other clients: ' + JSON.stringify(err)}
-		}
+		//get pool id before removing our connection (because we need the info still in dydb)
+		let poolId = await getPoolId(connectionId)
 		//now remove the connection
-		await deleteConnection(event.requestContext.connectionId)
-		//if delete was successful then return the error info from the update clients counter call (if delete unsuccessful then we won't get this far)
-		if (updateCounterError) {
-			return updateCounterError
+		await deleteConnection(connectionId)
+		//now send a toast saying that the client disconnected and send counter info
+		let toastMessage = {
+			type: messageTypeClientLeft,
+			value: `Client disconnected.`
 		}
-	} catch (err) {
+		let counterMessage = await buildClientsCounterMessageFromPoolId(poolId)
+		await sendMessageToPoolId(event, poolId, [toastMessage, counterMessage])
+	} catch (e) {
 		console.error(e)
-		return {statusCode: 500, body: 'Failed to disconnect: ' + JSON.stringify(err)}
+		return {statusCode: 500, body: 'Failed to disconnect: ' + JSON.stringify(e)}
 	}
 
 	return {statusCode: 200, body: 'Disconnected.'}

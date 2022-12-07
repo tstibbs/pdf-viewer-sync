@@ -1,15 +1,10 @@
 import {aws} from '../utils.js'
 import {getPoolId, getConnectionIdsInPool, deleteConnection} from '../persistance.js'
-import {updateClientsCounter} from './client-count.js'
-import {messageTypeClientJoined} from '../../../ui-additions/src/constants.js'
+import {buildClientsCounterMessageFromEvent} from './client-count.js'
+import {messageTypeClientJoined, messageTypeMulti} from '../../../ui-additions/src/constants.js'
 
 export async function sendMessage(event, message, sendToSender = false) {
 	const {connectionId} = event.requestContext
-	const isJoinNotification = message.type == messageTypeClientJoined
-
-	const apigwManagementApi = new aws.ApiGatewayManagementApi({
-		endpoint: event.requestContext.domainName + '/' + event.requestContext.stage
-	})
 
 	let poolId = await getPoolId(connectionId)
 	let connectionIds = await getConnectionIdsInPool(poolId)
@@ -21,6 +16,26 @@ export async function sendMessage(event, message, sendToSender = false) {
 	if (!sendToSender) {
 		//remove our connection id because for example no point telling the originator to change page when it literally just changed to this number
 		connectionIds = connectionIds.filter(id => id != connectionId)
+	}
+
+	await sendMessageToConnections(event, connectionIds, message)
+}
+
+export async function sendMessageToPoolId(event, poolId, message) {
+	let connectionIds = await getConnectionIdsInPool(poolId)
+	await sendMessageToConnections(event, connectionIds, message)
+}
+
+async function sendMessageToConnections(event, connectionIds, message) {
+	const apigwManagementApi = new aws.ApiGatewayManagementApi({
+		endpoint: event.requestContext.domainName + '/' + event.requestContext.stage
+	})
+
+	if (Array.isArray(message)) {
+		message = {
+			type: messageTypeMulti,
+			value: message
+		}
 	}
 
 	console.log(`Sending ${JSON.stringify(message)} to ${connectionIds.join(',')}`)
@@ -38,18 +53,18 @@ export async function sendMessage(event, message, sendToSender = false) {
 	})
 
 	await Promise.all(postCalls)
-
-	console.log({isJoinNotification})
-	if (isJoinNotification) {
-		//send notification to everyone to ensure that everyone has got the current counts, including the client that just joined
-		await updateClientsCounter(event, false, true)
-	}
 }
 
 export async function handler(event) {
 	try {
 		const message = JSON.parse(event.body).data
 		await sendMessage(event, message)
+		const isJoinNotification = message.type == messageTypeClientJoined
+		console.log({isJoinNotification})
+		if (isJoinNotification) {
+			let countsMessage = await buildClientsCounterMessageFromEvent(event, false)
+			await sendMessage(event, countsMessage, true)
+		}
 	} catch (e) {
 		console.error(e)
 		return {statusCode: 500, body: e.stack}

@@ -38,7 +38,12 @@ export async function getPoolId(connectionId) {
 		ProjectionExpression: TABLE_SCHEMA.attributes.poolId
 	}
 	let connectionData = await dydbClient.get(params).promise()
-	return connectionData.Item[TABLE_SCHEMA.attributes.poolId]
+	if (connectionData == null || Object.entries(connectionData).length == 0) {
+		console.log(connectionData)
+		throw new Error(`No connections found for ${connectionId}`)
+	} else {
+		return connectionData.Item[TABLE_SCHEMA.attributes.poolId]
+	}
 }
 
 export async function getConnectionIdsInPool(poolId) {

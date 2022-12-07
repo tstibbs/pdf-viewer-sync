@@ -8,7 +8,9 @@ import {
 	actionSendMessage,
 	messageTypeLoadFile,
 	messageTypeClientJoined,
-	messageTypeCounterUpdate
+	messageTypeClientLeft,
+	messageTypeCounterUpdate,
+	messageTypeMulti
 } from './constants.js'
 import {changePage, loadPdfFromParams, getCurrentPage} from './pdf-integration.js'
 import {ResilientWebSocket} from './websocket.js'
@@ -100,8 +102,17 @@ export class Comms {
 			case messageTypeClientJoined:
 				this._recievedClientJoined(data.value)
 				break
+			case messageTypeClientLeft:
+				this._recievedClientLeft(data.value)
+				break
 			case messageTypeCounterUpdate:
 				this._recievedCounterUpdate(data.value)
+				break
+			case messageTypeMulti:
+				this._recievedMultiMessage(data.value)
+				break
+			case undefined:
+				console.error(JSON.stringify(data))
 				break
 			default:
 				console.error('Unexpected data type: ' + data.type)
@@ -130,9 +141,17 @@ export class Comms {
 		this._onClientJoinedListener()
 	}
 
+	_recievedClientLeft(message) {
+		this._notifier.showMessage(message)
+	}
+
 	_recievedCounterUpdate(count) {
 		this.#clientsCounter = count
 		this.#connectionStateChangeListener()
+	}
+
+	_recievedMultiMessage(messages) {
+		messages.forEach(message => this._handleMessage(message))
 	}
 
 	onClientJoined(listener) {
