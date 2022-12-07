@@ -85,7 +85,9 @@ if (unsupportedFeatures.length > 0) {
 		'), please either use a more modern browser (ideally Chrome) or report a bug at https://github.com/tstibbs/pdf-viewer-sync/issues/new.'
 	try {
 		console.log(errorMessage)
-		document.write(errorMessage)
+		
+			document.write(errorMessage)
+		
 		document.execCommand('Stop')
 	} catch (err) {
 		console.error(err)
@@ -99,7 +101,9 @@ if (unsupportedFeatures.length > 0) {
 		// This file must have no dependencies and must be loaded first, so it can warn of any issues loading dependent libraries
 
 const showDebug =
-	new URLSearchParams(location.search).has('debug') || new URLSearchParams(location.hash.substring(1)).has('debug')
+	false ||
+	new URLSearchParams(location.search).has('debug') ||
+	new URLSearchParams(location.hash.substring(1)).has('debug')
 
 if (showDebug) {
 	var functionsToWrap = ['log', 'error', 'warn']
@@ -133,7 +137,7 @@ if (showDebug) {
 		if (container != null) {
 			var elem = document.createElement('p')
 			elem.className = 'error'
-			args.map(arg => {
+			args = args.map(arg => {
 				if (typeof arg === 'string') {
 					return arg
 				} else {
@@ -200,7 +204,9 @@ if (showDebug) {
 	<p class="title">Some errors may have occurred:</p>
 	<div id="errors-list"></div>
 	<div>
-		If these are errors, you may wish to report them by raising a
+		
+			If these are errors, you may wish to report them by raising a 
+		
 		<a href="https://github.com/tstibbs/pdf-viewer-sync/issues/new">bug report</a>.
 	</div>
 	<a id="dismiss-button" href="#">Hide</a>

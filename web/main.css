@@ -1,6 +1,10 @@
 /*!*********************************************************************!*\
   !*** css ./node_modules/css-loader/dist/cjs.js!./src/additions.css ***!
   \*********************************************************************/
+:root {
+	--share-icon-url: url(6046aacfc24d7e5e1f1c.svg); /*default for when no icon has been set*/
+}
+
 .sync-base-panel {
 	position: absolute;
 	left: 0;
@@ -62,8 +66,16 @@ button#openFile {
 }
 
 .toolbarButton.shareAndSync::before {
-	-webkit-mask-image: url(6046aacfc24d7e5e1f1c.svg);
-	mask-image: url(6046aacfc24d7e5e1f1c.svg);
+	mask-image: var(--share-icon-url);
+	-webkit-mask-image: var(--share-icon-url);
+}
+
+.toolbarButton.shareAndSync.connected::before {
+	background-color: #00cd00; /*bright green*/
+}
+
+.toolbarButton.shareAndSync.disconnected::before {
+	background-color: #eb0000; /*slightly dark red*/
 }
 
 /*!****************************************************************************************!*\
