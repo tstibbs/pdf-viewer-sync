@@ -49,14 +49,18 @@ const {distributionDomainName, bucketName} = await getOutputs(websiteStackName, 
 const {endpointUrl} = await getOutputs(pdfSyncStackName, pdfSyncCredentialsProfile)
 
 const generateFileHtml = (filePath, name) => {
-	//generate url
-	let parsedTemplateUrl = new URL(templateUrl)
-	const baseUrl = new URL(parsedTemplateUrl.pathname, parsedTemplateUrl.href).href
-	const urlParams = new URLSearchParams(parsedTemplateUrl.hash.substring(1))
-	urlParams.set(urlParamForObject, `${objectPrefix}/${filePath}`)
+	if (!filePath.endsWith('.pdf')) {
+		return undefined //don't want to create a link to pdfjs so just fall back to default download code instead
+	} else {
+		//generate url
+		let parsedTemplateUrl = new URL(templateUrl)
+		const baseUrl = new URL(parsedTemplateUrl.pathname, parsedTemplateUrl.href).href
+		const urlParams = new URLSearchParams(parsedTemplateUrl.hash.substring(1))
+		urlParams.set(urlParamForObject, `${objectPrefix}/${filePath}`)
 
-	//generate html snippet
-	return `<a target="pdfsync" href="${baseUrl}#${urlParams}">${name}</a>`
+		//generate html snippet
+		return `<a target="pdfsync" href="${baseUrl}#${urlParams}">${name}</a>`
+	}
 }
 
 const indexGenerator = new IndexGenerator(localPath, bucketName, basePath, {
