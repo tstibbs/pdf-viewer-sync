@@ -30,7 +30,7 @@ export class Components {
 	}
 
 	build() {
-		if (this._urlUtils.isJoiningExistingPool()) {
+		if (this._urlUtils.isJoiningExistingPool() && this._urlUtils.getPosition() == null) {
 			this._addJoinPanel()
 		}
 		this._addSharePanel()
