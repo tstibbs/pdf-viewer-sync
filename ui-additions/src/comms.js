@@ -32,20 +32,18 @@ export class Comms {
 		this._notifier = new Notifier()
 		this._urlUtils = urlUtils
 		// initialise such that we don't publish a 'page change' event when we load the file and switch to the right page
-		this._lastRecievedPageNumber = this._urlUtils.getStartingPage + this._urlUtils.getPosition()
-		// initialise such that we don't publish a 'file change' event when we load the file
-		this._lastRecievedFileLoad = this._urlUtils.getFile()
-		this._joinToken = this._urlUtils.getJoinToken()
+		this._lastPageNumberSet = this._urlUtils.getStartingPage + this._urlUtils.getPosition()
+		this._lastFileLoad = null //initialise to null so that an update is sent when 'reopening' the primary client
 		this.#endpoint = this._urlUtils.getEndpoint()
-		this.#apiInterface = new ApiInterface(this._joinToken, this.#endpoint)
 	}
 
 	async init() {
+		this.#apiInterface = new ApiInterface(this._urlUtils.getJoinToken(), this.#endpoint)
 		let joinInfo = await this.#apiInterface.fetchJoinInfo()
-		this._joinToken = joinInfo.poolId
+		let joinToken = joinInfo.poolId
 		const webSocketBase = this.#endpoint.startsWith('http') ? 'ws' + this.#endpoint.substring(4) : this.#endpoint
-		const websocketUrl = `${webSocketBase}/${commsUrlPrefix}?${apiGatewayJoinTokenParam}=${this._joinToken}`
-		this._urlUtils.updateJoinToken(this._joinToken)
+		const websocketUrl = `${webSocketBase}/${commsUrlPrefix}?${apiGatewayJoinTokenParam}=${joinToken}`
+		this._urlUtils.updateJoinToken(joinToken)
 		this._socket = new ResilientWebSocket(
 			websocketUrl,
 			this._handleMessage.bind(this),
@@ -132,17 +130,26 @@ export class Comms {
 		// if the user hasn't yet chosen a position param, ignore this event
 		if (this._urlUtils.isPositionSet()) {
 			let position = this._urlUtils.getPosition()
-			this._lastRecievedPageNumber = pageNumber + position
-			changePage(pageNumber, position)
+			let newPageNumber = pageNumber + position
+			if (newPageNumber != this._lastPageNumberSet) {
+				this._lastPageNumberSet = newPageNumber
+				changePage(pageNumber, position)
+			} else {
+				console.log(`ignoring unnecessary page change request to ${pageNumber}+${position}`)
+			}
 		}
 	}
 
 	_recievedLoadFile({file, page}) {
-		this._lastRecievedFileLoad = file
-		let position = this._urlUtils.getPosition()
-		this._lastRecievedPageNumber = page + position
-		this._urlUtils.updateFile(file)
-		loadPdfFromParams(page, position)
+		if (file != this._lastFileLoad) {
+			this._lastFileLoad = file
+			let position = this._urlUtils.getPosition()
+			this._lastPageNumberSet = page + position
+			this._urlUtils.updateFile(file)
+			loadPdfFromParams(page, position)
+		} else {
+			console.log(`ignoring unnecessary file load request for ${file}`)
+		}
 	}
 
 	_recievedClientJoined(message) {
@@ -180,11 +187,14 @@ export class Comms {
 		// if the user hasn't yet chosen a position param, ignore this event
 		//attempt to prevent infinite loop from events firing for changes we previously recieved
 		if (this._urlUtils.isPositionSet()) {
-			if (pageNumber != this._lastRecievedPageNumber) {
+			if (pageNumber != this._lastPageNumberSet) {
+				console.log(`page changed to ${pageNumber}, telling clients to switch to that page`)
 				pageNumber -= this._urlUtils.getPosition()
-				this._lastRecievedPageNumber = null
+				this._lastPageNumberSet = null
 				await this.waitForSocketReady()
 				this._sendChangePage(pageNumber)
+			} else {
+				console.log(`page changed to ${pageNumber}, _not_ telling clients to switch to that page`)
 			}
 		}
 	}
@@ -192,11 +202,14 @@ export class Comms {
 	async sendLoadFile(file) {
 		this._urlUtils.updateFile(file)
 		//attempt to prevent infinite loop from events firing for changes we previously recieved
-		if (file != this._lastRecievedFileLoad) {
-			this._lastRecievedPageNumber = null
-			this._lastRecievedFileLoad = null
+		if (file != this._lastFileLoad) {
+			console.log(`file changed to ${file}, telling clients to load that URL`)
+			this._lastPageNumberSet = null
+			this._lastFileLoad = file
 			await this.waitForSocketReady()
 			this._sendLoadFile(file)
+		} else {
+			console.log(`file changed to ${file}, _not_ telling clients to load that URL`)
 		}
 	}
 

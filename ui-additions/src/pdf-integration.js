@@ -47,7 +47,6 @@ function _waitForPromise(comms) {
 			//this is the default file that gets loaded on startup, so ignore
 			if (file != 'compressed.tracemonkey-pldi-09.pdf') {
 				if (_isValidUrl(file)) {
-					console.log(`file changed to ${file}, telling clients to load that URL`)
 					comms.sendLoadFile(file)
 				} else {
 					console.log(`file changed to ${file}, not a valid URL so uploading file ready to share`)
@@ -68,7 +67,6 @@ function _waitForPromise(comms) {
 			let timeoutId = setTimeout(() => {
 				//ignore any events that occur within
 				const {pageNumber} = event
-				console.log(`page changed to ${pageNumber}`)
 				comms.sendPageChange(pageNumber)
 			}, 10)
 			timeoutCalls.push(timeoutId)
