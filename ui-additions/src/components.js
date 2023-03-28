@@ -12,7 +12,7 @@ const icons = [icon0, icon1, icon2, icon3, icon4, icon5, icon6]
 export class Components {
 	#sharePanelShown
 
-	constructor(urlUtils, sharer, comms) {
+	constructor(urlUtils, sharer, comms, connectionSaver) {
 		this._urlUtils = urlUtils
 		this._sharer = sharer
 		this._comms = comms
@@ -27,6 +27,18 @@ export class Components {
 		this._openSharePanelButton.classList.add('toolbarButton')
 		this._openSharePanelButton.classList.add('shareAndSync')
 		this.#setShareIcon(0) //default to zero clients connected, just so there's something to show
+		//check if we should try to reconnect
+		if (this._urlUtils.getJoinToken() == null) {
+			let connectionInfo = connectionSaver.fetchConnectionInfo()
+			if (connectionInfo != null) {
+				let reconnect = confirm(`Recently connected pool detected - do you want to reconnect?`)
+				if (reconnect === true) {
+					let {joinToken, position} = connectionInfo
+					this._urlUtils.updateJoinToken(joinToken)
+					this._urlUtils.updatePosition(position)
+				}
+			}
+		}
 	}
 
 	build() {

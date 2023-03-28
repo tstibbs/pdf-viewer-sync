@@ -4,6 +4,7 @@ import {listenForChanges} from './pdf-integration.js'
 import {Comms} from './comms.js'
 import {Sharer} from './sharer.js'
 import {UrlUtils} from './url-utils.js'
+import {ConnectionSaver} from './connection-saver.js'
 
 //show the presentation mode button as a normal button, not hidden in the secondary menu
 const presentationMode = document.getElementById('presentationMode')
@@ -24,8 +25,10 @@ class UiAdditions {
 		await stayAwaker.init()
 		if (this.#endpoint != null && this.#endpoint.length > 0) {
 			const sharer = new Sharer(this._urlUtils)
-			const comms = new Comms(stayAwaker, this._urlUtils)
-			const components = new Components(this._urlUtils, sharer, comms)
+			const connectionSaver = new ConnectionSaver(this._urlUtils)
+			console.log(connectionSaver.fetchConnectionInfo())
+			const comms = new Comms(stayAwaker, this._urlUtils, connectionSaver)
+			const components = new Components(this._urlUtils, sharer, comms, connectionSaver)
 			try {
 				await comms.init()
 				components.build()

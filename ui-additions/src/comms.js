@@ -22,10 +22,12 @@ export class Comms {
 	#endpoint
 	#clientsCounter // counts the number of clients in the pool, including this one
 	#connectionStateChangeListener
+	#connectionSaver
 
-	constructor(stayAwaker, urlUtils) {
+	constructor(stayAwaker, urlUtils, connectionSaver) {
 		this.#clientsCounter = 0
 		this.#stayAwaker = stayAwaker
+		this.#connectionSaver = connectionSaver
 		this._uaParser = new UAParser()
 		this._notifier = new Notifier()
 		this._urlUtils = urlUtils
@@ -51,6 +53,7 @@ export class Comms {
 			this.#connectionStateChangeListener
 		)
 		await this.waitForSocketReady()
+		this.#activityHappened()
 	}
 
 	_sendChangePage(pageNumber) {
@@ -88,10 +91,16 @@ export class Comms {
 			message.data = data
 		}
 		this._socket.send(message)
+		this.#activityHappened()
+	}
+
+	#activityHappened() {
+		this.#connectionSaver.saveConnectionInfo()
 	}
 
 	_handleMessage(data) {
 		console.log(`message recieved: ${JSON.stringify(data)}`)
+		this.#activityHappened()
 		switch (data.type) {
 			case messageTypeChangePage:
 				this._recievedPageChange(data.value)
