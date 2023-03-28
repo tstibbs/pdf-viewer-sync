@@ -169,8 +169,8 @@ export class Comms {
 
 	async sendPageChange(pageNumber) {
 		// if the user hasn't yet chosen a position param, ignore this event
+		//attempt to prevent infinite loop from events firing for changes we previously recieved
 		if (this._urlUtils.isPositionSet()) {
-			//attempt to prevent infinite loop from events firing for changes we previously recieved
 			if (pageNumber != this._lastRecievedPageNumber) {
 				pageNumber -= this._urlUtils.getPosition()
 				this._lastRecievedPageNumber = null
@@ -182,9 +182,10 @@ export class Comms {
 
 	async sendLoadFile(file) {
 		this._urlUtils.updateFile(file)
+		//attempt to prevent infinite loop from events firing for changes we previously recieved
 		if (file != this._lastRecievedFileLoad) {
-			//attempt to prevent infinite loop from events firing for changes we previously recieved
 			this._lastRecievedPageNumber = null
+			this._lastRecievedFileLoad = null
 			await this.waitForSocketReady()
 			this._sendLoadFile(file)
 		}
