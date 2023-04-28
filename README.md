@@ -49,6 +49,10 @@ As the file path is set in the 'hash' part of the URL, it can be updated without
 <a target="pdfsync" href="https://tstibbs.github.io/pdf-viewer-sync/web/#endpoint=<endpointUrl>&file=https%3A%2F%2Fwww.example.com%2Ffile2.pdf">File 2.pdf</a>
 ```
 
+# Architecture
+
+[High level architecture diagram](high-level-architecture.png)
+
 # Contributing
 
 PRs are very welcome, but for any big changes or new features please open an issue to discuss first.
