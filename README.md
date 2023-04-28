@@ -1,4 +1,4 @@
-# pdf-viewer-sync
+# What is this?
 
 This project is an attempt to provide a pdf viewer for mobile devices that syncs page changes across multiple devices. This could be used for many different things, but the main use-case that inspired this project is the situation where you are attempting to play pdf sheet music. It is generally desirable to be able to see multiple pages of music at the same time, as it is often not convenient to turn the page at the point in the music that just happens to be at the bottom of each page. Using this project, you are able to bring up a pdf viewer on multiple devices, showing the same pdf, and when you change page on one device the other devices will also change page. The tool also allows you to open a pdf on one device and have it sync across (via cloud storage) to another device.
 
@@ -44,3 +44,7 @@ As the file path is set in the 'hash' part of the URL, it can be updated without
 <a target="pdfsync" href="https://tstibbs.github.io/pdf-viewer-sync/web/#endpoint=<endpointUrl>&file=https%3A%2F%2Fwww.example.com%2Ffile1.pdf">File 1.pdf</a>
 <a target="pdfsync" href="https://tstibbs.github.io/pdf-viewer-sync/web/#endpoint=<endpointUrl>&file=https%3A%2F%2Fwww.example.com%2Ffile2.pdf">File 2.pdf</a>
 ```
+
+# Contributing
+
+PRs are very welcome, but for any big changes or new features please open an issue to discuss first.
