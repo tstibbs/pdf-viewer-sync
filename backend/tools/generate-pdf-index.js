@@ -14,7 +14,7 @@ aws.config.apiVersions = {
 const args = process.argv.slice(2)
 if (args.length != 5 && args.length != 6) {
 	console.error(
-		'Usage: AWS_PROFILE=websiteCredentialsProfile node tools/gen-index-page.js pdfSyncCredentialsProfile localPath basePath websiteStackName pdfSyncStackName [localTestOutputFile]'
+		'Usage: AWS_PROFILE=websiteCredentialsProfile node tools/generate-pdf-index.js pdfSyncCredentialsProfile localPath basePath websiteStackName pdfSyncStackName [localTestOutputFile]'
 	)
 	process.exit(1)
 }
