@@ -3,5 +3,25 @@
   "extends": [
     "config:recommended",
     ":dependencyDashboard"
+  ],
+  "labels": ["dependencies"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "labels": [
+        "dep-upgrade-major"
+      ]
+    },
+    {
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "labels": [
+        "dep-upgrade-minor-patch"
+      ]
+    }
   ]
 }
