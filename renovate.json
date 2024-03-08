@@ -7,6 +7,7 @@
   "labels": ["dependencies"],
   "packageRules": [
     {
+      "groupName": "devDependencies (major)",
       "matchUpdateTypes": [
         "major"
       ],
@@ -15,6 +16,7 @@
       ]
     },
     {
+      "groupName": "devDependencies (minor/patch)",
       "matchUpdateTypes": [
         "minor",
         "patch"
