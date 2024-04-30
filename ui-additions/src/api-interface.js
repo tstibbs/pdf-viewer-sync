@@ -34,7 +34,7 @@ export class ApiInterface {
 	}
 
 	async uploadFile(fileName, data) {
-		let {data: urls} = await this.#axios.get(endpointGetItemUrls, {
+		let {data: urls} = await this.#axios.post(endpointGetItemUrls, {
 			params: {
 				[endpointFileNameParam]: fileName,
 				[endpointPoolIdParam]: this.#poolId
