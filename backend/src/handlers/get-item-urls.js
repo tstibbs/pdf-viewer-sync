@@ -5,8 +5,13 @@ import {endpointFileNameParam, endpointPoolIdParam} from '../../../ui-additions/
 const s3 = new aws.S3()
 
 export async function handler(event) {
-	const fileName = event.queryStringParameters?.[endpointFileNameParam]
-	const poolId = event.queryStringParameters?.[endpointPoolIdParam]
+	let {body} = event
+	if (event.isBase64Encoded) {
+		body = Buffer.from(event.body, 'base64')
+	}
+	body = JSON.parse(body)
+	const fileName = body?.[endpointFileNameParam]
+	const poolId = body?.[endpointPoolIdParam]
 	let errors = []
 	if (fileName == null || fileName.length == 0) {
 		errors.push("parameter 'fileName' must be specified and non-empty string")
