@@ -38,7 +38,12 @@ class DeployStack extends Stack {
 			//let's keep our various APIs separate under their own subpaths, thus let's make the default path completely invalid.
 			origin: new HttpOrigin('default.not.in.use.invalid')
 		}
-		const cloudFrontResources = new CloudFrontResources(this, COUNTRIES_DENY_LIST, cloudfrontDefaultBehavior)
+		const cloudFrontResources = new CloudFrontResources(
+			this,
+			COUNTRIES_DENY_LIST,
+			cloudfrontDefaultBehavior,
+			allowedOrigins
+		)
 		cloudFrontResources.addWebSocketApi(commsUrlPrefix, webSocketStage)
 
 		let s3TempWebStorageResources = new S3TempWebStorageResources(
