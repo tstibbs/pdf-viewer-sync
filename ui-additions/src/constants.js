@@ -16,5 +16,7 @@ export const actionSendMessage = 'sendmessage'
 export const actionPing = 'ping'
 export const endpointGetJoinInfo = 'getJoinInfo'
 export const endpointGetItemUrls = 'getItemUrls'
+
+//must match the equivalents in cloud-core/aws/utils/src/stacks/s3-temp-web-storage/shared/constants.js
 export const endpointFileNameParam = 'fileName'
-export const endpointPoolIdParam = 'poolId'
+export const endpointPrefixesParam = 'prefixes'

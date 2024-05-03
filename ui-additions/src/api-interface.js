@@ -4,7 +4,7 @@ import {
 	endpointGetJoinInfo,
 	endpointGetItemUrls,
 	endpointFileNameParam,
-	endpointPoolIdParam,
+	endpointPrefixesParam,
 	apiGatewayJoinTokenParam
 } from './constants.js'
 
@@ -34,11 +34,9 @@ export class ApiInterface {
 	}
 
 	async uploadFile(fileName, data) {
-		let {data: urls} = await this.#axios.get(endpointGetItemUrls, {
-			params: {
-				[endpointFileNameParam]: fileName,
-				[endpointPoolIdParam]: this.#poolId
-			}
+		let {data: urls} = await this.#axios.post(endpointGetItemUrls, {
+			[endpointFileNameParam]: fileName,
+			[endpointPrefixesParam]: [this.#poolId]
 		})
 		const {getUrl, putUrl} = urls
 		await axios.put(putUrl, data, {
