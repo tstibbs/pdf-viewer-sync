@@ -17,7 +17,7 @@
 		"@tstibbs/cloud-core-utils": "file:../../cloud-core/aws/utils",
 		"aws-cdk": "^2.110.0",
 		"aws-cdk-lib": "^2.110.0",
-		"esbuild": "^0.19.6",
+		"esbuild": "^0.20.0",
 		"jest": "^29.7.0"
 	},
 	"scripts": {
