@@ -1,8 +1,8 @@
 import assert from 'assert'
 
 import {Stack, CfnOutput, Duration} from 'aws-cdk-lib'
-import {HttpLambdaIntegration} from '@aws-cdk/aws-apigatewayv2-integrations-alpha'
-import {HttpMethod} from '@aws-cdk/aws-apigatewayv2-alpha'
+import {HttpLambdaIntegration} from 'aws-cdk-lib/aws-apigatewayv2-integrations'
+import {HttpMethod} from 'aws-cdk-lib/aws-apigatewayv2'
 import {HttpOrigin} from 'aws-cdk-lib/aws-cloudfront-origins'
 
 import {applyStandardTags} from '@tstibbs/cloud-core-utils'
