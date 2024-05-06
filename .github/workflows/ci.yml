@@ -14,19 +14,19 @@ jobs:
 
     # checkout a dependent project
     - name: Checkout cloud-core
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: tstibbs/cloud-core
         path: 'cloud-core' # will resolve to /home/runner/work/pdf-viewer-sync/pdf-viewer-sync/cloud-core
 
     # checkout 'this' project
     - name: Checkout pdf-viewer-sync
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         path: 'pdf-viewer-sync' # will resolve to /home/runner/work/pdf-viewer-sync/pdf-viewer-sync/pdf-viewer-sync
 
     - name: Set up node
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v4
       with:
         node-version: 20.x
     - name: Set up environment
