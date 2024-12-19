@@ -31,7 +31,8 @@ export class Components {
 		if (this._urlUtils.getJoinToken() == null) {
 			let connectionInfo = connectionSaver.fetchConnectionInfo()
 			if (connectionInfo != null) {
-				let reconnect = confirm(`Recently connected pool detected - do you want to reconnect?`)
+				let date = new Date(connectionInfo.date)
+				let reconnect = confirm(`Reconnect to pool last connected on ${date.toLocaleString()}?`)
 				if (reconnect === true) {
 					let {joinToken, position} = connectionInfo
 					this._urlUtils.updateJoinToken(joinToken)

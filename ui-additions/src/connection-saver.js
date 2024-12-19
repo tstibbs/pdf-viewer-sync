@@ -1,5 +1,4 @@
 const storageId = 'pdf-viewer-sync/connection-saver'
-const maxAge = 60 * 60 * 1000 //one hour in millis
 
 export class ConnectionSaver {
 	#urlUtils
@@ -19,16 +18,10 @@ export class ConnectionSaver {
 	}
 
 	fetchConnectionInfo() {
-		const now = Date.now()
 		try {
 			const blob = localStorage.getItem(storageId)
 			if (blob != null) {
-				const data = this.#deserialise(blob)
-				let {date} = data
-				let age = now - date
-				if (age < maxAge) {
-					return data
-				}
+				return this.#deserialise(blob)
 			}
 		} catch (e) {
 			//ignore, there are so many (valid) reasons why this can fail and this is all just best efforts anyway
