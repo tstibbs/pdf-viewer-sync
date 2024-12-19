@@ -1009,7 +1009,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpac
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"Sharer\": () => (/* binding */ Sharer)\n/* harmony export */ });\n/* harmony import */ var qrcode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! qrcode */ \"./node_modules/qrcode/lib/browser.js\");\n\n\nclass Sharer {\n\tconstructor(urlUtils) {\n\t\tthis._urlUtils = urlUtils\n\t}\n\n\tasync showShareInfo(canvas) {\n\t\tconst shareUrl = this._urlUtils.generateClientUrl()\n\t\tawait qrcode__WEBPACK_IMPORTED_MODULE_0__.toCanvas(canvas, shareUrl)\n\t\treturn shareUrl\n\t}\n}\n\n\n//# sourceURL=webpack://@tstibbs/pdf-viewer-sync-ui/./src/sharer.js?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export */ __webpack_require__.d(__webpack_exports__, {\n/* harmony export */   \"Sharer\": () => (/* binding */ Sharer)\n/* harmony export */ });\n/* harmony import */ var qrcode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! qrcode */ \"./node_modules/qrcode/lib/browser.js\");\n\n\nclass Sharer {\n\tconstructor(urlUtils) {\n\t\tthis._urlUtils = urlUtils\n\t}\n\n\tasync showShareInfo(canvas) {\n\t\tconst shareUrl = this._urlUtils.generateClientUrl()\n\t\tawait qrcode__WEBPACK_IMPORTED_MODULE_0__.toCanvas(canvas, shareUrl)\n\t\tcanvas.removeAttribute('style') //gets set by the qrcode lib but we want to override using a stylesheet\n\t\treturn shareUrl\n\t}\n}\n\n\n//# sourceURL=webpack://@tstibbs/pdf-viewer-sync-ui/./src/sharer.js?");
 
 /***/ }),
 
