@@ -8,6 +8,7 @@ export class Sharer {
 	async showShareInfo(canvas) {
 		const shareUrl = this._urlUtils.generateClientUrl()
 		await qrcode.toCanvas(canvas, shareUrl)
+		canvas.removeAttribute('style') //gets set by the qrcode lib but we want to override using a stylesheet
 		return shareUrl
 	}
 }

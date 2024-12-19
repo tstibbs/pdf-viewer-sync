@@ -33,6 +33,14 @@
 	flex-direction: column;
 	flex-wrap: wrap;
 	padding: 10px;
+	max-width: 100%;
+	overflow: auto;
+}
+
+#sync-share-canvas {
+	width: 90%;
+	max-width: 90vh;
+	max-height: 90vh;
 }
 
 .sync-base-panel label {
@@ -42,7 +50,13 @@
 #sync-share-link {
 	font-family: sans-serif;
 	text-align: center;
-	padding: 15px;
+	padding-top: 15px;
+	padding-bottom: 15px;
+	max-width: 100%;
+}
+
+#sync-share-link > a {
+	word-wrap: break-word;
 }
 
 div#toolbarViewerMiddle,
