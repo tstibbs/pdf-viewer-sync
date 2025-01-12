@@ -16,7 +16,8 @@
 		"aws-cdk": "^2.140.0",
 		"aws-cdk-lib": "^2.140.0",
 		"esbuild": "^0.20.2",
-		"jest": "^29.7.0"
+		"jest": "^29.7.0",
+		"yargs": "^17.7.2"
 	},
 	"scripts": {
 		"testsynth": "cdk-tools testsynth",

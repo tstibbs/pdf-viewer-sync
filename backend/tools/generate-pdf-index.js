@@ -4,6 +4,8 @@ import {strict as assert} from 'assert'
 
 import {IndexGenerator} from '@tstibbs/cloud-core-utils/src/tools/generate-s3-index.js'
 
+import yargs from 'yargs'
+import {hideBin} from 'yargs/helpers'
 import aws from 'aws-sdk'
 aws.config.region = 'eu-west-2'
 aws.config.apiVersions = {
@@ -11,15 +13,28 @@ aws.config.apiVersions = {
 	cloudformation: '2010-05-15'
 }
 
-const args = process.argv.slice(2)
-if (args.length != 5 && args.length != 6) {
-	console.error(
-		'Usage: AWS_PROFILE=websiteCredentialsProfile node tools/generate-pdf-index.js pdfSyncCredentialsProfile localPath basePath websiteStackName pdfSyncStackName [localTestOutputFile]'
+const yargConfig = yargs(hideBin(process.argv))
+	.command(
+		'$0 <pdfSyncCredentialsProfile> <localPath> <basePath> <websiteStackName> <pdfSyncStackName>',
+		'the default command',
+		yargs => {
+			IndexGenerator.buildYargs(yargs)
+			yargs
+				.positional('pdfSyncCredentialsProfile', {})
+				.positional('localPath', {})
+				.positional('basePath', {})
+				.positional('websiteStackName', {})
+				.positional('pdfSyncStackName', {})
+				.option('localTestOutputFile', {
+					describe: 'If specified, write the generated index to this file, instead of uploading it',
+					type: 'file'
+				})
+		}
 	)
-	process.exit(1)
-}
-const [pdfSyncCredentialsProfile, localPath, basePath, websiteStackName, pdfSyncStackName] = args.slice(0, 5)
-const localTestOutputFile = args.length >= 6 ? args[5] : null
+	.help('help')
+const yargv = await yargConfig.parse()
+
+const {pdfSyncCredentialsProfile, localPath, basePath, websiteStackName, pdfSyncStackName, localTestOutputFile} = yargv
 
 function buildApi(apiKey, credentialsProfileName) {
 	let options = {}
@@ -63,10 +78,16 @@ const generateFileHtml = (filePath, name) => {
 	}
 }
 
-const indexGenerator = new IndexGenerator(localPath, bucketName, basePath, {
-	fileIcon: 'fa-long-arrow-down',
-	openFileGenerator: generateFileHtml
-})
+const indexGenerator = new IndexGenerator(
+	localPath,
+	bucketName,
+	basePath,
+	{
+		fileIcon: 'fa-long-arrow-down',
+		openFileGenerator: generateFileHtml
+	},
+	yargv
+)
 
 const templateUrl = `https://tstibbs.github.io/pdf-viewer-sync/web/#endpoint=${encodeURIComponent(endpointUrl)}`
 const urlParamForObject = 'file'
