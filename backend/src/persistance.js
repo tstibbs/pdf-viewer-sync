@@ -12,7 +12,7 @@ export async function deleteConnection(connectionId) {
 			[TABLE_SCHEMA.pk]: connectionId
 		}
 	}
-	await dydbClient.delete(params).promise()
+	await dydbClient.delete(params)
 }
 
 export async function putConnection(connectionId, poolId) {
@@ -26,7 +26,7 @@ export async function putConnection(connectionId, poolId) {
 			[TABLE_SCHEMA.ttl]: expirationSeconds //must be a number
 		}
 	}
-	await dydbClient.put(params).promise()
+	await dydbClient.put(params)
 }
 
 export async function getPoolId(connectionId) {
@@ -37,7 +37,7 @@ export async function getPoolId(connectionId) {
 		},
 		ProjectionExpression: TABLE_SCHEMA.attributes.poolId
 	}
-	let connectionData = await dydbClient.get(params).promise()
+	let connectionData = await dydbClient.get(params)
 	if (connectionData == null || Object.entries(connectionData).length == 0) {
 		console.log(connectionData)
 		throw new Error(`No connections found for ${connectionId}`)
@@ -56,6 +56,6 @@ export async function getConnectionIdsInPool(poolId) {
 		},
 		ProjectionExpression: TABLE_SCHEMA.pk
 	}
-	let connectionData = await dydbClient.query(lookUpPoolParams).promise()
+	let connectionData = await dydbClient.query(lookUpPoolParams)
 	return connectionData.Items.map(attrs => attrs[TABLE_SCHEMA.pk])
 }

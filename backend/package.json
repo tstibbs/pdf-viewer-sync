@@ -11,7 +11,9 @@
 		"dotenv": "^16.4.5"
 	},
 	"devDependencies": {
+		"@aws-sdk/client-cloudformation": "^3.726.1",
 		"@aws-sdk/client-s3": "^3.568.0",
+		"@aws-sdk/credential-providers": "^3.726.1",
 		"@tstibbs/cloud-core-utils": "file:../../cloud-core/aws/utils",
 		"aws-cdk": "^2.140.0",
 		"aws-cdk-lib": "^2.140.0",

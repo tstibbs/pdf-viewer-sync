@@ -41,7 +41,7 @@ async function sendMessageToConnections(event, connectionIds, message) {
 	console.log(`Sending ${JSON.stringify(message)} to ${connectionIds.join(',')}`)
 	const postCalls = connectionIds.map(async connectionId => {
 		try {
-			await apigwManagementApi.postToConnection({ConnectionId: connectionId, Data: JSON.stringify(message)}).promise()
+			await apigwManagementApi.postToConnection({ConnectionId: connectionId, Data: JSON.stringify(message)})
 		} catch (e) {
 			if (e.statusCode === 410) {
 				console.log(`Found stale connection, deleting ${connectionId}`)
