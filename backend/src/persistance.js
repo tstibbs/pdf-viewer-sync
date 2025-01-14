@@ -1,9 +1,11 @@
-import {TABLE_NAME, aws} from './utils.js'
+import {TABLE_NAME} from './utils.js'
 import {TABLE_SCHEMA} from './constants.js'
+import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
+import {DynamoDB} from '@aws-sdk/client-dynamodb'
 
 const expirationTime = 1.5 * 24 * 60 * 60 //one and a half days in seconds
 
-export const dydbClient = new aws.DynamoDB.DocumentClient()
+export const dydbClient = DynamoDBDocument.from(new DynamoDB())
 
 export async function deleteConnection(connectionId) {
 	const params = {
@@ -12,7 +14,7 @@ export async function deleteConnection(connectionId) {
 			[TABLE_SCHEMA.pk]: connectionId
 		}
 	}
-	await dydbClient.delete(params).promise()
+	await dydbClient.delete(params)
 }
 
 export async function putConnection(connectionId, poolId) {
@@ -26,7 +28,7 @@ export async function putConnection(connectionId, poolId) {
 			[TABLE_SCHEMA.ttl]: expirationSeconds //must be a number
 		}
 	}
-	await dydbClient.put(params).promise()
+	await dydbClient.put(params)
 }
 
 export async function getPoolId(connectionId) {
@@ -37,7 +39,7 @@ export async function getPoolId(connectionId) {
 		},
 		ProjectionExpression: TABLE_SCHEMA.attributes.poolId
 	}
-	let connectionData = await dydbClient.get(params).promise()
+	let connectionData = await dydbClient.get(params)
 	if (connectionData == null || Object.entries(connectionData).length == 0) {
 		console.log(connectionData)
 		throw new Error(`No connections found for ${connectionId}`)
@@ -56,6 +58,6 @@ export async function getConnectionIdsInPool(poolId) {
 		},
 		ProjectionExpression: TABLE_SCHEMA.pk
 	}
-	let connectionData = await dydbClient.query(lookUpPoolParams).promise()
+	let connectionData = await dydbClient.query(lookUpPoolParams)
 	return connectionData.Items.map(attrs => attrs[TABLE_SCHEMA.pk])
 }

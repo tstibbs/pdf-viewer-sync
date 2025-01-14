@@ -3,15 +3,12 @@
 import {strict as assert} from 'assert'
 
 import {IndexGenerator} from '@tstibbs/cloud-core-utils/src/tools/generate-s3-index.js'
+import {defaultAwsClientConfig} from '@tstibbs/cloud-core-utils/src/tools/aws-client-config.js'
 
 import yargs from 'yargs'
 import {hideBin} from 'yargs/helpers'
-import aws from 'aws-sdk'
-aws.config.region = 'eu-west-2'
-aws.config.apiVersions = {
-	s3: '2006-03-01',
-	cloudformation: '2010-05-15'
-}
+import {CloudFormation} from '@aws-sdk/client-cloudformation'
+import {fromIni} from '@aws-sdk/credential-providers'
 
 const yargConfig = yargs(hideBin(process.argv))
 	.command(
@@ -36,25 +33,25 @@ const yargv = await yargConfig.parse()
 
 const {pdfSyncCredentialsProfile, localPath, basePath, websiteStackName, pdfSyncStackName, localTestOutputFile} = yargv
 
-function buildApi(apiKey, credentialsProfileName) {
-	let options = {}
-	if (credentialsProfileName != null) {
-		let creds = new aws.CredentialProviderChain([new aws.SharedIniFileCredentials({profile: credentialsProfileName})])
-		options = {
-			credentialProvider: creds
-		}
+function buildApi(credentialsProfileName) {
+	let options = {
+		...defaultAwsClientConfig
 	}
-	let api = new aws[apiKey](options)
+	if (credentialsProfileName != null) {
+		options.credentials = fromIni({
+			profile: credentialsProfileName
+		})
+	}
+	let api = new CloudFormation(options)
 	return api
 }
 
 async function getOutputs(stackName, credentialsProfileName) {
-	const cloudformation = buildApi('CloudFormation', credentialsProfileName)
-	let response = await cloudformation
-		.describeStacks({
-			StackName: stackName
-		})
-		.promise()
+	const cloudformation = buildApi(credentialsProfileName)
+	let response = await cloudformation.describeStacks({
+		StackName: stackName
+	})
+
 	assert.equal(response.Stacks.length, 1)
 	let outputs = Object.fromEntries(response.Stacks[0].Outputs.map(output => [output.OutputKey, output.OutputValue]))
 	return outputs

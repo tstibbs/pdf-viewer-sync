@@ -1,4 +1,4 @@
-import {aws} from '../utils.js'
+import {ApiGatewayManagementApi} from '@aws-sdk/client-apigatewaymanagementapi'
 import {getPoolId, getConnectionIdsInPool, deleteConnection} from '../persistance.js'
 import {buildClientsCounterMessageFromEvent} from './client-count.js'
 import {messageTypeClientJoined, messageTypeMulti} from '../../../ui-additions/src/constants.js'
@@ -27,8 +27,8 @@ export async function sendMessageToPoolId(event, poolId, message) {
 }
 
 async function sendMessageToConnections(event, connectionIds, message) {
-	const apigwManagementApi = new aws.ApiGatewayManagementApi({
-		endpoint: event.requestContext.domainName + '/' + event.requestContext.stage
+	const apigwManagementApi = new ApiGatewayManagementApi({
+		endpoint: 'https://' + event.requestContext.domainName + '/' + event.requestContext.stage
 	})
 
 	if (Array.isArray(message)) {
@@ -41,9 +41,9 @@ async function sendMessageToConnections(event, connectionIds, message) {
 	console.log(`Sending ${JSON.stringify(message)} to ${connectionIds.join(',')}`)
 	const postCalls = connectionIds.map(async connectionId => {
 		try {
-			await apigwManagementApi.postToConnection({ConnectionId: connectionId, Data: JSON.stringify(message)}).promise()
+			await apigwManagementApi.postToConnection({ConnectionId: connectionId, Data: JSON.stringify(message)})
 		} catch (e) {
-			if (e.statusCode === 410) {
+			if (e['$metadata'].httpStatusCode === 410) {
 				console.log(`Found stale connection, deleting ${connectionId}`)
 				await deleteConnection(connectionId)
 			} else {
