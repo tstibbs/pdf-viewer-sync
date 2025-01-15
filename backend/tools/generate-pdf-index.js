@@ -3,7 +3,7 @@
 import {strict as assert} from 'assert'
 
 import {IndexGenerator} from '@tstibbs/cloud-core-utils/src/tools/generate-s3-index.js'
-import {awsServiceConfig} from '@tstibbs/cloud-core-utils/src/tools/aws-client-config.js'
+import {defaultAwsClientConfig} from '@tstibbs/cloud-core-utils/src/tools/aws-client-config.js'
 
 import yargs from 'yargs'
 import {hideBin} from 'yargs/helpers'
@@ -35,7 +35,7 @@ const {pdfSyncCredentialsProfile, localPath, basePath, websiteStackName, pdfSync
 
 function buildApi(credentialsProfileName) {
 	let options = {
-		...awsServiceConfig('CloudFormation')
+		...defaultAwsClientConfig
 	}
 	if (credentialsProfileName != null) {
 		options.credentials = fromIni({

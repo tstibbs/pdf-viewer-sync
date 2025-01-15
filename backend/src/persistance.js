@@ -1,9 +1,11 @@
-import {TABLE_NAME, aws} from './utils.js'
+import {TABLE_NAME} from './utils.js'
 import {TABLE_SCHEMA} from './constants.js'
+import {DynamoDBDocument} from '@aws-sdk/lib-dynamodb'
+import {DynamoDB} from '@aws-sdk/client-dynamodb'
 
 const expirationTime = 1.5 * 24 * 60 * 60 //one and a half days in seconds
 
-export const dydbClient = new aws.DynamoDB.DocumentClient()
+export const dydbClient = DynamoDBDocument.from(new DynamoDB())
 
 export async function deleteConnection(connectionId) {
 	const params = {
