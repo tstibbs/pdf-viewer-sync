@@ -14,7 +14,7 @@ export function buildGenericHandler(stack, name, entry, envs) {
 		entry: `src/handlers/${entry}.js`,
 		memorySize: 128,
 		timeout: Duration.seconds(20),
-		runtime: Runtime.NODEJS_20_X,
+		runtime: Runtime.NODEJS_22_X,
 		environment: envs
 	})
 	return handler

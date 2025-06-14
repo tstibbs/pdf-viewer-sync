@@ -2,25 +2,25 @@
 	"name": "@tstibbs/pdf-viewer-sync-backend",
 	"private": true,
 	"engines": {
-		"node": ">=20",
+		"node": ">=22",
 		"npm": ">=10"
 	},
 	"type": "module",
 	"dependencies": {
-		"@aws-sdk/client-api-gateway": "^3.726.1",
-		"@aws-sdk/client-dynamodb": "^3.726.1",
-		"dotenv": "^16.4.5"
+		"@aws-sdk/client-api-gateway": "^3.828.0",
+		"@aws-sdk/client-dynamodb": "^3.828.0",
+		"dotenv": "^16.5.0"
 	},
 	"devDependencies": {
-		"@aws-sdk/client-cloudformation": "^3.726.1",
-		"@aws-sdk/client-s3": "^3.568.0",
-		"@aws-sdk/credential-providers": "^3.726.1",
+		"@aws-sdk/client-cloudformation": "^3.828.0",
+		"@aws-sdk/client-s3": "^3.828.0",
+		"@aws-sdk/credential-providers": "^3.828.0",
 		"@tstibbs/cloud-core-utils": "file:../../cloud-core/aws/utils",
-		"aws-cdk": "^2.140.0",
-		"aws-cdk-lib": "^2.140.0",
-		"esbuild": "^0.20.2",
-		"jest": "^29.7.0",
-		"yargs": "^17.7.2"
+		"aws-cdk": "^2.1018.1",
+		"aws-cdk-lib": "^2.200.2",
+		"esbuild": "^0.25.5",
+		"jest": "^30.0.0",
+		"yargs": "^18.0.0"
 	},
 	"scripts": {
 		"testsynth": "cdk-tools testsynth",
