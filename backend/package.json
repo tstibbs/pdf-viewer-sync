@@ -8,7 +8,10 @@
 	"type": "module",
 	"dependencies": {
 		"@aws-sdk/client-api-gateway": "^3.828.0",
+		"@aws-sdk/client-apigatewaymanagementapi": "^3.830.0",
 		"@aws-sdk/client-dynamodb": "^3.828.0",
+		"@aws-sdk/lib-dynamodb": "^3.830.0",
+		"@aws-sdk/s3-request-presigner": "^3.832.0",
 		"dotenv": "^16.5.0"
 	},
 	"devDependencies": {
