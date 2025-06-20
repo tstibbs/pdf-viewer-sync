@@ -1,6 +1,6 @@
 import {fileURLToPath} from 'url'
 import {resolve} from 'path'
-import {readFile} from 'fs/promises'
+import {readFileSync} from 'fs'
 
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
@@ -13,7 +13,7 @@ import {defaultLicenseWebpackPluginConfig} from '@tstibbs/cloud-core-ui/build/li
 const projectName = `pdf-viewer-sync`
 const bugReportUrl = `https://github.com/tstibbs/${projectName}/issues/new`
 
-const mitLicenceText = await readFile('./build/third-party-licences/MIT-License.txt')
+const mitLicenceText = readFileSync('./build/third-party-licences/MIT-License.txt')
 const licenseTextOverrides = {
 	'encode-utf8': mitLicenceText,
 	toastr: mitLicenceText
@@ -38,8 +38,8 @@ const hostedOriginReplacer = (content, absoluteFrom) => {
 	}
 }
 
-async function renderTemplate() {
-	let contents = (await readFile('public/web/viewer.html')).toString()
+function renderTemplate() {
+	let contents = readFileSync('public/web/viewer.html').toString()
 	let headAdditions = `
 	<style>
 		<%- include('./node_modules/@tstibbs/cloud-core-ui/templates/error-display.css.ejs') %>
@@ -87,7 +87,7 @@ export default {
 			]
 		}),
 		new HtmlWebpackPlugin({
-			templateContent: await renderTemplate()
+			templateContent: renderTemplate()
 		}),
 		new MiniCssExtractPlugin(),
 		new LicenseWebpackPlugin({
