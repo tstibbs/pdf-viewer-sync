@@ -3,10 +3,9 @@ import assert from 'assert'
 import {Stack, CfnOutput, Duration} from 'aws-cdk-lib'
 import {HttpLambdaIntegration} from 'aws-cdk-lib/aws-apigatewayv2-integrations'
 import {HttpMethod} from 'aws-cdk-lib/aws-apigatewayv2'
-import {HttpOrigin} from 'aws-cdk-lib/aws-cloudfront-origins'
 
 import {applyStandardTags} from '@tstibbs/cloud-core-utils'
-import {CloudFrontResources} from '@tstibbs/cloud-core-utils/src/stacks/cloudfront.js'
+import {CloudFrontResources, cloudfrontDefaultBehavior} from '@tstibbs/cloud-core-utils/src/stacks/cloudfront.js'
 import {S3TempWebStorageResources} from '@tstibbs/cloud-core-utils/src/stacks/s3-temp-web-storage/lib/stack.js'
 
 import {buildCommsLayer} from './commsLayer.js'
@@ -34,10 +33,6 @@ class DeployStack extends Stack {
 
 		const webSocketStage = buildCommsLayer(this)
 
-		const cloudfrontDefaultBehavior = {
-			//let's keep our various APIs separate under their own subpaths, thus let's make the default path completely invalid.
-			origin: new HttpOrigin('default.not.in.use.invalid')
-		}
 		const cloudFrontResources = new CloudFrontResources(
 			this,
 			COUNTRIES_DENY_LIST,
@@ -52,6 +47,7 @@ class DeployStack extends Stack {
 			allowedOrigins,
 			Duration.days(1),
 			requestsUrlPrefix,
+			'bucket',
 			endpointGetItemUrls
 		)
 		this.#httpApi = s3TempWebStorageResources.httpApi
