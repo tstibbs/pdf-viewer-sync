@@ -11,13 +11,13 @@
 		"@aws-sdk/client-apigatewaymanagementapi": "^3.939.0",
 		"@aws-sdk/client-dynamodb": "^3.939.0",
 		"@aws-sdk/lib-dynamodb": "^3.939.0",
+		"@tstibbs/cloud-core-utils": "file:../../cloud-core/aws/utils",
 		"dotenv": "^16.6.1"
 	},
 	"devDependencies": {
 		"@aws-sdk/client-cloudformation": "^3.939.0",
 		"@aws-sdk/client-s3": "^3.939.0",
 		"@aws-sdk/credential-providers": "^3.939.0",
-		"@tstibbs/cloud-core-utils": "file:../../cloud-core/aws/utils",
 		"aws-cdk": "^2.1033.0",
 		"aws-cdk-lib": "^2.229.0",
 		"esbuild": "^0.27.0",
@@ -26,6 +26,8 @@
 	},
 	"scripts": {
 		"testsynth": "cdk-tools testsynth",
-		"test": "cdk-tools testcdk"
+		"test": "cdk-tools testcdk",
+		"reinstall-local-modules": "npm uninstall @tstibbs/cloud-core-utils && npm install file:../../cloud-core/aws/utils --install-links",
+		"postinstall": "npm run reinstall-local-modules"
 	}
 }
