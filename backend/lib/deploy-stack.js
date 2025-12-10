@@ -48,7 +48,8 @@ class DeployStack extends Stack {
 			Duration.days(1),
 			requestsUrlPrefix,
 			'bucket',
-			endpointGetItemUrls
+			endpointGetItemUrls,
+			props.keys
 		)
 		this.#httpApi = s3TempWebStorageResources.httpApi
 

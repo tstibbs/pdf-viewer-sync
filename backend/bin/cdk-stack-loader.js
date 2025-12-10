@@ -3,4 +3,4 @@
 import {buildStack} from '../lib/deploy-utils.js'
 import {STACK_NAME} from '../lib/deploy-envs.js'
 
-buildStack(STACK_NAME)
+await buildStack(STACK_NAME)
