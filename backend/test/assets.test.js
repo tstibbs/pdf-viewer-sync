@@ -1,8 +1,8 @@
 import {validateCdkAssets} from '@tstibbs/cloud-core-utils'
-import {STACK_NAME} from '../lib/deploy-envs.js'
+import {buildStack} from '../lib/deploy-utils.js'
 
 test('Assets are built as expected', async () => {
-	//7 assets:
+	//8 assets:
 	//connectHandler
 	//disconnectHandler
 	//messageHandler
@@ -10,5 +10,6 @@ test('Assets are built as expected', async () => {
 	//getJoinInfo-handler
 	//getItemUrls-handler
 	//CustomS3AutoDeleteObjects
-	await validateCdkAssets(STACK_NAME, 7)
-})
+	//generate keys function
+	await validateCdkAssets(buildStack, 8)
+}, 15000)
