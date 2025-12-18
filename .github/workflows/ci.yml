@@ -44,21 +44,28 @@ jobs:
       working-directory: cloud-core/ui
 
     # root
-    - run: npm ci
+    - name: "root: npm ci"
+      run: npm ci
       working-directory: pdf-viewer-sync
 
     # backend
-    - run: npm ci
+    - name: "backend: npm ci"
+      run: npm ci
       working-directory: pdf-viewer-sync/backend
-    - run: npm run testsynth
+    - name: "backend: synth"
+      run: npm run testsynth
       working-directory: pdf-viewer-sync/backend
-    - run: npm run test
+    - name: "backend: test"
+      run: npm run test
       working-directory: pdf-viewer-sync/backend
 
     # frontend
-    - run: npm ci
+    - name: "frontend: npm ci"
+      run: npm ci
       working-directory: pdf-viewer-sync/ui-additions
-    - run: npm run download-deps
+    - name: "frontend: download deps"
+      run: npm run download-deps
       working-directory: pdf-viewer-sync/ui-additions
-    - run: npm run build
+    - name: "frontend: build"
+      run: npm run build
       working-directory: pdf-viewer-sync/ui-additions
