@@ -12,60 +12,40 @@ jobs:
 
     steps:
 
-    # checkout a dependent project
-    - name: Checkout cloud-core
-      uses: actions/checkout@v4
-      with:
-        repository: tstibbs/cloud-core
-        path: 'cloud-core' # will resolve to /home/runner/work/pdf-viewer-sync/pdf-viewer-sync/cloud-core
-
-    # checkout 'this' project
     - name: Checkout pdf-viewer-sync
       uses: actions/checkout@v4
-      with:
-        path: 'pdf-viewer-sync' # will resolve to /home/runner/work/pdf-viewer-sync/pdf-viewer-sync/pdf-viewer-sync
 
-    - name: Set up node
-      uses: actions/setup-node@v4
-      with:
-        node-version: 22.x
+    - name: Set up dependencies
+      uses: jdx/mise-action@v4
     - name: Set up environment
       run: mkdir cdk.tmp
-      working-directory: pdf-viewer-sync/backend
+      working-directory: backend
     - name: Set up test environment
       run: cp dummy.env .env
-      working-directory: pdf-viewer-sync/backend
-
-    - name: Load cloud-core utils dependencies
-      run: npm ci
-      working-directory: cloud-core/aws/utils
-    - name: Load cloud-core ui dependencies
-      run: npm ci
-      working-directory: cloud-core/ui
+      working-directory: backend
 
     # root
-    - name: "root: npm ci"
-      run: npm ci
-      working-directory: pdf-viewer-sync
+    - name: "root: pnpm ci"
+      run: pnpm ci
 
     # backend
-    - name: "backend: npm ci"
-      run: npm ci
-      working-directory: pdf-viewer-sync/backend
+    - name: "backend: pnpm ci"
+      run: pnpm ci
+      working-directory: backend
     - name: "backend: synth"
-      run: npm run testsynth
-      working-directory: pdf-viewer-sync/backend
+      run: pnpm run testsynth
+      working-directory: backend
     - name: "backend: test"
-      run: npm run test
-      working-directory: pdf-viewer-sync/backend
+      run: pnpm run test
+      working-directory: backend
 
     # frontend
-    - name: "frontend: npm ci"
-      run: npm ci
-      working-directory: pdf-viewer-sync/ui-additions
+    - name: "frontend: pnpm ci"
+      run: pnpm ci
+      working-directory: ui-additions
     - name: "frontend: download deps"
-      run: npm run download-deps
-      working-directory: pdf-viewer-sync/ui-additions
+      run: pnpm run download-deps
+      working-directory: ui-additions
     - name: "frontend: build"
-      run: npm run build
-      working-directory: pdf-viewer-sync/ui-additions
+      run: pnpm run build
+      working-directory: ui-additions

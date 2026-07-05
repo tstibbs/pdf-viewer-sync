@@ -1,9 +1,17 @@
 {
 	"name": "@tstibbs/pdf-viewer-sync-root",
 	"private": true,
-	"engines": {
-		"node": ">=16",
-		"npm": ">=8"
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": "22",
+			"onFail": "error"
+		},
+		"packageManager": {
+			"name": "pnpm",
+			"version": ">=11.7",
+			"onFail": "error"
+		}
 	},
 	"devDependencies": {
 		"lint-staged": "^17.0.8",
