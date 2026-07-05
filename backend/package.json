@@ -7,21 +7,21 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@aws-sdk/client-api-gateway": "^3.939.0",
-		"@aws-sdk/client-apigatewaymanagementapi": "^3.939.0",
-		"@aws-sdk/client-dynamodb": "^3.939.0",
-		"@aws-sdk/lib-dynamodb": "^3.939.0",
+		"@aws-sdk/client-api-gateway": "^3.1079.0",
+		"@aws-sdk/client-apigatewaymanagementapi": "^3.1079.0",
+		"@aws-sdk/client-dynamodb": "^3.1079.0",
+		"@aws-sdk/lib-dynamodb": "^3.1079.0",
 		"@tstibbs/cloud-core-utils": "file:../../cloud-core/aws/utils",
 		"dotenv": "^16.6.1"
 	},
 	"devDependencies": {
-		"@aws-sdk/client-cloudformation": "^3.939.0",
-		"@aws-sdk/client-s3": "^3.939.0",
-		"@aws-sdk/credential-providers": "^3.939.0",
-		"aws-cdk": "^2.1033.0",
-		"aws-cdk-lib": "^2.229.0",
-		"esbuild": "^0.27.0",
-		"jest": "^30.2.0",
+		"@aws-sdk/client-cloudformation": "^3.1079.0",
+		"@aws-sdk/client-s3": "^3.1079.0",
+		"@aws-sdk/credential-providers": "^3.1079.0",
+		"aws-cdk": "^2.1125.0",
+		"aws-cdk-lib": "^2.249.0",
+		"esbuild": "^0.28.1",
+		"jest": "^30.4.2",
 		"yargs": "^18.0.0"
 	},
 	"scripts": {
