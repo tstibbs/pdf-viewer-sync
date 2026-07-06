@@ -40,6 +40,7 @@
 	"scripts": {
 		"_pre": "rm -rf dist",
 		"build": "pnpm run _pre && webpack",
+		"deploy": "pnpm run build && ./deploy.sh",
 		"serve": "http-server dist -c-1",
 		"dev": "pnpm run _pre && webpack serve",
 		"download-deps": "node build/download-deps.js"
